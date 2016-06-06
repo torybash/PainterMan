@@ -1,0 +1,136 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class GameHelper {
+
+
+
+	public static Vector2 PosToVec2(Vec2i pos){
+		float xPos = Mathf.Sqrt(3f) * pos.x + (pos.y % 2 == 1 ? Mathf.Sqrt(3f)/2f : 0);
+		float yPos = 1.5f * pos.y;
+		return new Vector2(xPos, yPos);
+	}
+}
+
+[System.Serializable]
+public class TileDefinition{
+	public TileType type = TileType.Normal;
+	public TileColor color = TileColor.None;
+
+	public int paintedTurn = -1;
+
+}
+
+[System.Serializable]
+public enum TileType{
+
+	Empty		 		= 0,
+	Normal				,
+	Bucket				,
+
+	Start				= 10,
+	Goal				,
+}
+
+[System.Serializable]
+public enum TileColor{
+	None				= 0,
+	Red					,
+	Green				,
+	Blue				,
+}
+
+[System.Serializable]
+public struct Vec2i{
+	public int x;
+	public int y;
+
+	public static Vec2i Zero{
+		get{return new Vec2i(0,0);}
+	}
+
+	public Vec2i(Vec2i vec){
+		this.x = vec.x;
+		this.y = vec.y;
+	}
+
+	public Vec2i(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
+
+	public override string ToString ()
+	{
+		return string.Format ("[Vec2i x: {0}, y: {1}]", x, y);
+	}
+
+	public override bool Equals(object obj)
+	{
+		return (obj is Vec2i) ? this == (Vec2i)obj : false;
+	}
+
+	public bool Equals(Vec2i other)
+	{
+		return this == other;
+	}
+
+	public override int GetHashCode()
+	{
+		int hashCode = 1 + 17 * x + 33 * y;
+		return hashCode;
+	}
+
+	#region Operators
+
+	public static bool operator ==(Vec2i value1, Vec2i value2)
+	{
+		return value1.x == value2.x
+			&& value1.y == value2.y;
+	}
+
+	public static bool operator !=(Vec2i value1, Vec2i value2)
+	{
+		return !(value1 == value2);
+	}
+
+	public static Vec2i operator +(Vec2i value1, Vec2i value2)
+	{
+		Vec2i result = new Vec2i();
+		result.x = value1.x +value2.x;
+		result.y = value1.y +value2.y;
+		return result;
+	}
+
+	public static Vec2i operator -(Vec2i value)
+	{
+		Vec2i result = new Vec2i(-value.x, -value.y);
+		return result;
+	}
+
+	public static Vec2i operator -(Vec2i value1, Vec2i value2)
+	{
+		Vec2i result = new Vec2i();
+		result.x = value1.x - value2.x;
+		result.y = value1.y - value2.y;
+		return result;
+	}
+
+	public static Vec2i operator *(Vec2i value1, Vec2i value2)
+	{
+		Vec2i result = new Vec2i();
+		result.x = value1.x * value2.x;
+		result.y = value1.y * value2.y;
+		return result;
+	}
+
+	public static Vec2i operator /(Vec2i value1, Vec2i value2)
+	{
+		Vec2i result = new Vec2i();
+		result.x = value1.x / value2.x;
+		result.y = value1.y / value2.y;
+		return result;
+	}
+		
+	#endregion
+}
+	
