@@ -16,9 +16,16 @@ public class Tile : MonoBehaviour {
 		}
 	}
 
+	public void Set(TileType tileType, TileColor color) {
+		tileDef.type = tileType;
+		tileDef.color = color;
+		Refresh();
+	}
+
 	public void Refresh(){
 		if (tileDef.type == TileType.Empty){
-			Sr.enabled = false;	
+			//Sr.enabled = false;	
+			Debug.LogError("Empty tileType?!");
 		}else {
 			Sr.enabled = true;	
 			Sr.sprite = SpriteLibrary.GetTileSprite(tileDef.type);

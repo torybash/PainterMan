@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 /// <summary>
 /// Be aware this will not prevent a non singleton constructor
 ///   such as `T myT = new T();`
@@ -84,7 +86,9 @@ public class Library<T> : MonoBehaviour where T : MonoBehaviour {
 
 
 	public void Create(){
-		T newInstance = I;
+		if (I == null) {
+			Debug.LogError("[Library] Could not Create!");
+		}
 	}
 
 
@@ -105,27 +109,29 @@ public class Library<T> : MonoBehaviour where T : MonoBehaviour {
 					if (existing.Length > 0) {
 						Debug.Log("[Library] Existing Library(s) found: " + existing.Length + " - destroying!");
 						foreach (T item in existing) {
-							Destroy(item.gameObject);
-//							if (Application.isPlaying) Destroy(item.gameObject);
-//							else DestroyImmediate(item.gameObject);
+							if (Application.isPlaying) Destroy(item.gameObject);
 						}
 					}
 
-					string path = "_" + typeof(T).ToString();
-					T prefabObj = Resources.Load<T>(path);
-					if (prefabObj == null) {
-						Debug.LogWarning("[Library] No prefab for "+ typeof(T).ToString()+" found at location: Resources/"+ path);
-						return _instance;
+					if (_instance == null) {
+						string path = "_" + typeof(T).ToString();
+						T prefabObj = Resources.Load<T>(path);
+						if (prefabObj == null) {
+							Debug.LogWarning("[Library] No prefab for "+ typeof(T).ToString()+" found at location: Resources/"+ path);
+							return _instance;
+						}
+						if (!Application.isPlaying){
+							return prefabObj;
+						}
+
+						_instance = Instantiate(prefabObj).GetComponent<T>();
+						_instance.gameObject.name = "(Library) " + typeof(T).ToString();
+
+						DontDestroyOnLoad(_instance);
+
+						Debug.Log("[Library] An instance of " + typeof(T) + " is needed in the scene, so '" + prefabObj.gameObject +
+							"' was created with DontDestroyOnLoad.");
 					}
-
-					_instance = Instantiate(prefabObj).GetComponent<T>();
-					_instance.gameObject.name = "(Library) " + typeof(T).ToString();
-
-					Debug.Log("[Library] An instance of " + typeof(T) +
-						" is needed in the scene, so '" + prefabObj.gameObject +
-						"' was created with DontDestroyOnLoad.");
-					
-					if (Application.isPlaying) DontDestroyOnLoad(_instance);
 				}
 
 				return _instance;
@@ -144,25 +150,8 @@ public class Library<T> : MonoBehaviour where T : MonoBehaviour {
 	/// </summary>
 	public void OnDestroy() {
 		Debug.Log("[Library] OnDestroy - Application.isPlaying: "  +Application.isPlaying + " (_instance == this): " + (_instance == this));
-
 		if (Application.isPlaying && _instance == this) applicationIsQuitting = true;
 	}
-
-	public void Awake(){
-		Debug.Log("[Library] Awake - (_instance == this): " + (_instance == this));
-		if (_instance != null && this != _instance){
-			DestroyImmediate(gameObject);
-		}
-	}
-//	public void Awake(){
-//		Debug.Log("[Library] Awake");
-//	}
-//	public void Start(){
-//		Debug.Log("[Library] Start");
-//	}
-//	public void OnEnable(){
-//		Debug.Log("[Library] OnEnable");
-//	}
 }
 
 

@@ -36,7 +36,7 @@ public class Game : Controller<Game> {
 		Vec2i startPos = currLevel.GetStartPos();
 
 		playerPos = startPos;
-		playerObj.transform.position = GameHelper.PosToVec2(startPos);
+		playerObj.transform.position = GameHelper.TileToWorldPos(startPos);
 
 		started = true;;
 	}
@@ -84,7 +84,7 @@ public class Game : Controller<Game> {
 			Debug.Log("[Game] Move - move: "+ move + ", endPos: "+ endPos + ", endPos tile: "+ currLevel.GetTileType(endPos)); 
 
 			playerPos = endPos;
-			playerObj.transform.position = GameHelper.PosToVec2(playerPos);
+			playerObj.transform.position = GameHelper.TileToWorldPos(playerPos);
 
 
 			TileType tileTyp = currLevel.GetTileType(playerPos);
