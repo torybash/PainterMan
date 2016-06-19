@@ -1,147 +1,99 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using System.Security.Cryptography;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-public class Level : MonoBehaviour {
+public class Level : ProBehaviour {
 
-	[System.Serializable]
-	public class TileMap {
-		[SerializeField] private List<Tile> tileList;
-		private Dictionary<Vec2i, Tile> tileDict;
-
-		public void MakeDict() {
-			tileDict = new Dictionary<Vec2i, Tile>();
-			foreach (Tile tile in tileList) {
-				tileDict.Add(tile.pos, tile);
-			}
-		}
-
-		public void AddTile(Tile tile) {
-			tileList.Add(tile);
-		}
-
-		public bool IsValidTile(Vec2i pos) {
-			return GetTile(pos) != null;
-		}
-
-		public Tile GetTile(Vec2i pos) {
-			if (Application.isPlaying) {
-				if (tileDict == null) {
-					Debug.Log("why u not create already!");
-					MakeDict();
-				}
-				return tileDict[pos];
-			} else {
-				foreach (Tile tile in tileList) {
-					if (tile.pos == pos) return tile;
-				}
-			}
-			//Debug.Log("[TileMap] Could not find tile at pos: " + pos);
-			return null;
-		}
-		public Tile GetTileOfType(TileType tileType) {
-			foreach (Tile tile in tileList) {
-				if (tile.tileDef.type == tileType) return tile;
-			}
-			Debug.Log("[TileMap] Could not find tile of type: " + tileType);
-			return null;
-		}
-
-		public void DeleteTileAt(Vec2i pos) {
-			if (IsValidTile(pos)) {
-				Tile tile = GetTile(pos);
-				tileList.Remove(tile);
-#if UNITY_EDITOR
-				Undo.DestroyObjectImmediate(tile.gameObject);
-#endif
-				//GameObject.DestroyImmediate(tile.gameObject);
-			}
-		}
-	}
-
+	#region Variables
 	[SerializeField] GameObject tilePrefab;
-	//[SerializeField] List<GameObject> tileList;
-	[SerializeField] GameObject tileCont;
 
 	[SerializeField] TileMap tileMap;
 	public TileMap Map { get{ return tileMap;}}
-	//Tile[][] tileMap;
+	#endregion Variables
 
-	//[SerializeField] int width, height;
-
-
-	public void Init(){
-		//ReadTiles();
+	void Awake() {
+		tileMap.PrepareForBuild(); //TODO Do this in editor before building
 	}
 
+	public void UpdateTileObjects() {
+		foreach (var to in tileMap.TOList) {
+			to.UpdateTO();
+		}
+	}
+
+	#region Loading/Unloading
+	public void UnloadMap() {
+		tileMap.UnloadMap();
+	}
+
+	public void LoadTiles() {
+		foreach (var def in tileMap.TileDefList) {
+			CreateTileAtPos(def.pos, def);
+		}
+		foreach (var def in tileMap.TODefList) {
+			Type typ = Type.GetType(def.className);
+			CreateTOAtPos(typ, def);
+		}
+		tileMap.MakeDict();
+	}
+	#endregion Loading/Unloading
+
+	#region TileMap Wrappers
 	public Vec2i GetStartPos(){
-
-		return tileMap.GetTileOfType(TileType.Start).pos;
-		//for (int x = 0; x < tileMap.Length; x++) {
-		//	for (int y = 0; y < tileMap[x].Length; y++) {
-		//		if (tileMap[x][y].tileDef.type == TileType.Start) return new Vec2i(x, y);
-		//	}
-		//}
-		Debug.LogError("Level has not start pos! - returning zero");
-		return Vec2i.Zero;
+		return tileMap.GetTileOfType(TileType.Start).Pos;
 	}
-
+	public Vector2 GetCenterPos() {
+		Vector4 extremes = new Vector4(float.MaxValue, float.MinValue, float.MaxValue, float.MinValue); //min x, max x, min y, max y
+		foreach (var item in tileMap.TileList) {
+			Vector3 pos = item.transform.position;
+			if (pos.x < extremes.x) extremes.x = pos.x;
+			if (pos.x > extremes.y) extremes.y = pos.x;
+			if (pos.y < extremes.z) extremes.z = pos.y;
+			if (pos.y > extremes.w) extremes.w = pos.y;
+		}
+		return new Vector2((extremes.x + extremes.y)/2f, (extremes.z + extremes.w)/2f);
+	}
 	public bool IsValidTile(Vec2i pos) {
 		return tileMap.IsValidTile(pos);
-		//if (pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height) {
-		//	return tileMap[pos.x][pos.y].tileDef.type != TileType.Empty;
-		//}
-		//return false;
 	}
 
 	public TileType GetTileType(Vec2i pos){
 		if (tileMap.IsValidTile(pos)) {
-			return tileMap.GetTile(pos).tileDef.type;
+			return tileMap.GetTile(pos).TileDef.type;
 		}
 		return TileType.Empty;
 	}
 	public TileColor GetTileColorType(Vec2i pos){
 		if (tileMap.IsValidTile(pos)) {
-			return tileMap.GetTile(pos).tileDef.color;
+			return tileMap.GetTile(pos).TileDef.color;
 		}
 		return TileColor.None;
 	}
-	//public TileColor GetTileColorType(Vec2i pos){
-	//	if (IsValidTile(pos)){
-	//		return tileMap[pos.x][pos.y].tileDef.color;
-	//	}
-	//	return TileColor.None;
-	//}
-
 	public void PaintTile(Vec2i pos, TileColor tileColor, int turn){
 		if (IsValidTile(pos)){
 			Debug.Log("[Level] PaintTile - pos: "+ pos + ", tileColor: "+ tileColor + ", turn: "+ turn);
-
-			tileMap.GetTile(pos).tileDef.color = tileColor;
-			tileMap.GetTile(pos).tileDef.paintedTurn = turn;
-			//tileMap[pos.x][pos.y].tileDef.color = tileColor;
-			//tileMap[pos.x][pos.y].tileDef.paintedTurn = turn;
-
+			tileMap.GetTile(pos).TileDef.color = tileColor;
+			tileMap.GetTile(pos).TileDef.paintedTurn = turn;
 			tileMap.GetTile(pos).Refresh();
 		}
 	}
 
 	public bool IsWalkable(Vec2i pos, int turn){
 		Debug.Log("[Level] IsWalkable - pos: "+ pos + ", turn: "+ turn + ", tile: "+ tileMap.GetTile(pos) + ", is color dry?: "+ IsColorDry(pos, turn));
-		return tileMap.GetTile(pos).tileDef.color == TileColor.None || IsColorDry(pos, turn);
+		return tileMap.GetTile(pos).TileDef.color == TileColor.None || IsColorDry(pos, turn);
 	}
 	public bool IsColorDry(Vec2i pos, int turn){
 		if (IsValidTile(pos)){
-			if (tileMap.GetTile(pos).tileDef.type == TileType.Bucket) {
+			TileDefinition def = tileMap.GetTile(pos).TileDef;
+			if (def.type == TileType.Bucket) {
 				return true;
 			}
-			if (tileMap.GetTile(pos).tileDef.color != TileColor.None && tileMap.GetTile(pos).tileDef.paintedTurn + 5 <= turn){
+			if (def.color != TileColor.None && def.paintedTurn + GameRules.I.GetTimeToDry(def.color) < turn){
 //				Debug.Log("[Level] Color IS dry!");
 				return true;
 			}
@@ -151,59 +103,80 @@ public class Level : MonoBehaviour {
 		Debug.LogError("IsColorDry invalid pos!");
 		return false;
 	}
-	
-	#region Editor
-	//[SerializeField] Vec2i mapSize;
-	[SerializeField] public TileType tileType; 
-	[SerializeField] public TileColor tileColor; 
-
-	public void CreateTiles(int w = 10, int h = 10){
-		//		int w = 10, h = 10;height
-		//int w = this.width; int h = this.height;
-
-//		tiles[x][y] = new Tile();
-
-
-		//foreach (var item in tileList) {
-		//	if (item) DestroyImmediate(item);
-		//}
-		//tileList.Clear();
-
-		if (tileCont == null) tileCont = new GameObject("TileContainer");
-		tileCont.transform.SetParent(transform);
-		tileCont.transform.localScale = Vector3.one;
-
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				CreateTileAtPos(new Vec2i(x, y));
+	public bool CheckForWin() {
+		bool allTilesCorrectColor = true;
+		foreach (var item in tileMap.TileList) {
+			if (item.TileDef.color != item.TileDef.goalColor) {
+				allTilesCorrectColor = false;
+				break;
 			}
+		}
+		return allTilesCorrectColor;
+	}
+	#endregion TileMap Wrappers
+
+	#region Editor
+	[HideInInspector][SerializeField] public TileType tileType; 
+	[HideInInspector][SerializeField] public TileColor tileGoalColor; 
+	[HideInInspector][SerializeField] public TileColor tileColor; 
+
+	[HideInInspector][SerializeField] public TileObject tileObjectPrefab; 
+
+	[HideInInspector][SerializeField] public Texture boxTex; 
+	[HideInInspector][SerializeField] public Rect boxTexRect; 
+	[HideInInspector][SerializeField] GameObject tileCont;
+	private GameObject TileCont {
+		get {
+			if (tileCont == null) {
+				tileCont = new GameObject("_Tile Container");
+				tileCont.transform.SetParent(transform);
+			}
+			return tileCont;
+		}
+	}
+	[HideInInspector][SerializeField] GameObject toCont;
+	private GameObject TOCont {
+		get {
+			if (toCont == null) {
+				toCont = new GameObject("_TileObject Container");
+				toCont.transform.SetParent(transform);
+			}
+			return toCont;
 		}
 	}
 
-	public void CreateTileAtPos(Vec2i pos){
-		GameObject tileInst = Instantiate(tilePrefab);
-//
-		tileInst.gameObject.name = "Tile " + pos;
-		tileInst.transform.position = GameHelper.TileToWorldPos(pos);
+	public void CreateTileAtPos(Vec2i pos, TileDefinition tileDef){
+		Tile tileInst = PrefabLibrary.I.GetTileInstance();
+		tileInst.Set(tileDef);
 
-		tileInst.transform.SetParent(tileCont.transform);
+		tileInst.gameObject.name = "Tile " + pos;
+		tileInst.transform.position = GameHelper.TileToWorldPos(pos) + (Vector2)transform.position;
+		tileInst.transform.SetParent(TileCont.transform);
 		tileInst.transform.localScale = Vector3.one;
 
-		tileInst.GetComponent<Tile>().pos = pos;
-
-		tileMap.AddTile(tileInst.GetComponent<Tile>());
+		tileMap.AddTile(tileInst);
 	}
 
+	public void CreateTOAtPos(System.Type typ, TileObjectDefintion toDef) {
+		TileObject toInst = PrefabLibrary.I.GetTileObject(typ);
+		InitTO(toInst, toDef);
+	}
+	public void CreateTOAtPos<T>(T tileObject, TileObjectDefintion toDef) where T : TileObject{
+		//Log("CreateTileObjectAtPos: " + to + ", " + pos + ", typeof(T): " + typeof(T) + ", totype: "+ to.GetType());
+		TileObject toInst = PrefabLibrary.I.GetTileObject(tileObject);
+		InitTO(toInst, toDef);
+	}
 
-	//public void ReadTiles(){
-	//	tileMap = new Tile[width][];
-	//	for (int x = 0; x < tileMap.Length; x++) tileMap[x] = new Tile[height];
+	private void InitTO(TileObject toInst, TileObjectDefintion toDef) {
+		toInst.Set(toDef);
 
-	//	foreach (Transform tileTrans in tileCont.transform) {
-	//		Tile tile = tileTrans.GetComponent<Tile>();
-	//		tileMap[tile.pos.x][tile.pos.y] = tile;
-	//	}
-	//}
+		toInst.gameObject.name = "TO:" + toInst.GetType() + ", " + toDef.pos;
+		toInst.transform.position = GameHelper.TileToWorldPos(toDef.pos) + (Vector2)transform.position;
+		toInst.transform.SetParent(TOCont.transform);
+		toInst.transform.localScale = Vector3.one;
+
+		tileMap.AddTileObject(toInst);
+	}
 	#endregion Editor
 
 }
@@ -215,111 +188,258 @@ public class Level : MonoBehaviour {
 [CustomEditor(typeof(Level))]
 public class LevelEditor : Editor {
 
-	int hintID = -1;
-	int HintID {
+	private enum ControlType { Disabled, TilePaint, TileObject}
+	private ControlType currControl = ControlType.Disabled;
+
+	private int hintID = -1;
+	private int HintID {
 		get {
 			if (hintID == -1) hintID = GetHashCode();
 			return hintID;
 		}
 	}
 
-	Level Lvl { get { return (Level)target; } }
+	private Level Lvl { get { return (Level)target; } }
+	private Event current;
+	private bool altDown = false;
+	private bool ctrlDown = false;
 
-	private int width, height;
+	private int currTileObjectIdx;
+	private string[] tileObjectNames;
+	public string[] TileObjectNames {
+		get {
+			if (tileObjectNames == null) {
+				tileObjectNames = new string[PrefabLibrary.I.TileObjectPrefabs.Length];
+				for (int i = 0; i < tileObjectNames.Length; i++) {
+					tileObjectNames[i] = PrefabLibrary.I.TileObjectPrefabs[i].GetType().Name;
+				}
+			}
+			return tileObjectNames;
+		}
+	}
 
+	//private SerializedObject toDefintionSO;
+	//private SerializedProperty toDefinitionProp;
+	//private void SetTODefintion(Object obj) {
+	//	if (obj == null) return;
+	//	toDefintionSO = new SerializedObject(obj);
+	//	toDefinitionProp = toDefintionSO.FindProperty("def");
+	//}
 
-	public override void OnInspectorGUI ()
-	{
+	//private TileObjectDefintionHolder<TileObjectDefintion> toDefHolder;
+	//private TileObjectDefintionHolder<TileObjectDefintion> TODefHolder {
+	//	get {
+	//		if (toDefHolder == null) {
+	//			toDefHolder = ScriptableObject.CreateInstance<TileObjectDefintionHolder<TileObjectDefintion>>();
+	//		}
+	//		return toDefHolder;
+	//	}
+	//}
+
+	//private Texture boxTex;
+	public Texture SetBoxTex(Rect rect) {
+		if (Lvl.boxTex == null) {
+			Texture2D tex2D = new Texture2D((int)rect.width, (int)rect.height, TextureFormat.RGBA32, false, false);
+			Color32[] colors = new Color32[tex2D.width * tex2D.height];
+			for (int i = 0; i < colors.Length; i++) {
+				colors[i] = new Color32(1, 1, 1, 1);
+			}
+			tex2D.SetPixels32(colors);
+			tex2D.Apply();
+			Lvl.boxTex = tex2D;
+		}
+		return Lvl.boxTex;
+	}
+
+	public override void OnInspectorGUI (){
 		base.OnInspectorGUI ();
-
-		//GUILayout.Label("Custom Inspector", EditorStyles.boldLabel);
-		//if (GUILayout.Button("Create tiles")){
-		//	((Level)target).CreateTiles();
-		//}
-
-		//if (GUILayout.Button("Read tiles")){
-		//	((Level)target).ReadTiles();
-		//}
 	}
 
 	void OnSceneGUI(){
 		//Debug.Log("on scene gui- HintID: " + HintID  + ", Event.current: "+ Event.current);
 
-		Event current = Event.current;
+		GUI.changed = false;
+		current = Event.current;
 		int controlID = GUIUtility.GetControlID(HintID, FocusType.Passive);
 
 
+		#region Handles GUI
 		Handles.BeginGUI( );
-		//if (GUI.Button(new Rect(0, 0, 100, 40), "So cool!")) {
-		//	Debug.Log("Cool!");
-		//}
-		//EditorGUI.LabelField(new Rect(0, 50, 100, 40), "Editor label!");
+		Rect rect = new Rect(0, 0, 150, Screen.height / 2f);
+		if (Lvl.boxTex != null) {
+			//Debug.Log("Lvl.boxTexRect: " + Lvl.boxTexRect);
+			GUI.color = new Color32(255, 255, 255, 127);
+			GUI.Box(Lvl.boxTexRect, Lvl.boxTex);
+			GUI.color = Color.white;
+		}
+		GUILayout.BeginArea(rect);
 
-		//tileType = (TileType)EditorGUI.EnumPopup(new Rect(0, 90, 100, 40), tileType);
+		GUILayout.BeginVertical();
 
-		GUILayout.BeginArea(new Rect(0, 0, 150, Screen.height));
+		GUILayout.BeginHorizontal();
+		EditorGUILayout.LabelField("" + (currControl == ControlType.Disabled ? ">>" : "") + "Disable", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
+		bool disabledToggle = EditorGUILayout.Toggle(currControl == ControlType.Disabled);
+		if (disabledToggle) currControl = ControlType.Disabled; 
+		GUILayout.EndHorizontal();
+
+
+		GUILayout.BeginHorizontal();
+		EditorGUILayout.LabelField("" + (currControl == ControlType.TilePaint ? ">>" : "") + "Tile paint", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
+		bool paintToggle = EditorGUILayout.Toggle(currControl == ControlType.TilePaint);
+		if (paintToggle) currControl = ControlType.TilePaint; 
+		GUILayout.EndHorizontal();
 		Lvl.tileType = (TileType)EditorGUILayout.EnumPopup(Lvl.tileType);
 		if (SpriteLibrary.GetTileSprite(Lvl.tileType) != null) {
 			GUILayout.Box(SpriteLibrary.GetTileSprite(Lvl.tileType).texture, GUILayout.Width(60), GUILayout.Height(60));
 		}
+
+		EditorGUILayout.LabelField("Start color");
 		Lvl.tileColor = (TileColor)EditorGUILayout.EnumPopup(Lvl.tileColor);
 		EditorGUILayout.ColorField(GUIContent.none, SpriteLibrary.GetTileColor(Lvl.tileColor), false, false, false, null);
+
+		EditorGUILayout.LabelField("Goal color");
+		Lvl.tileGoalColor = (TileColor)EditorGUILayout.EnumPopup(Lvl.tileGoalColor);
+		EditorGUILayout.ColorField(GUIContent.none, SpriteLibrary.GetTileColor(Lvl.tileGoalColor), false, false, false, null);
+
+		EditorGUILayout.Space();
+		GUILayout.BeginHorizontal();
+
+		EditorGUILayout.LabelField("" + (currControl == ControlType.TileObject?">>":"") +"Tile objects", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
+		bool toToggle = EditorGUILayout.Toggle(currControl == ControlType.TileObject);
+		if (toToggle) currControl = ControlType.TileObject; 
+		GUILayout.EndHorizontal();
+
+		currTileObjectIdx = EditorGUILayout.Popup(currTileObjectIdx, TileObjectNames);
+		if (Lvl.tileObjectPrefab != null) {
+			foreach (var fieldInfo in Lvl.tileObjectPrefab.ToDef.GetType().GetFields()) {
+				//if (fieldInfo.Name == "pos" || fieldInfo.Name == "className") continue;
+				GUILayout.Label(fieldInfo.Name);
+				//if (toDefinitionProp != null && toDefinitionProp.FindPropertyRelative(fieldInfo.Name) != null) {
+				//	EditorGUILayout.PropertyField(toDefinitionProp.FindPropertyRelative(fieldInfo.Name), GUIContent.none);
+				//}
+				//EditorGUILayout.field
+				//new UnityEditor.SerializedObject()
+			}
+		}
+
+
+		GUILayout.EndVertical();
+		Rect newRect = GUILayoutUtility.GetLastRect();
+		if (newRect.width > 2) {
+			newRect.height += 10;
+			Lvl.boxTexRect = newRect;
+		}
+		SetBoxTex(Lvl.boxTexRect);
+
 		GUILayout.EndArea();
 		Handles.EndGUI();
+#endregion Handles GUI
 
+		
 
 		switch (current.type) {
+		case EventType.keyDown:
+			Debug.Log("KeyDown: " + current.keyCode);
+			//if (current.keyCode == KeyCode.LeftAlt || current.keyCode == KeyCode.RightAlt) { altDown = !altDown;}
+			//else if (current.keyCode == KeyCode.LeftControl || current.keyCode == KeyCode.RightControl) ctrlDown = !ctrlDown;
+			//else 
+			if (InputHelper.GetNumberPressed(current.keyCode) != -1) {
+				NumberPressed(InputHelper.GetNumberPressed(current.keyCode));
+				current.Use();
+			} else {
+				if (current.keyCode == KeyCode.Tab) {
+					currControl = (ControlType)((((int)currControl) + 1)%System.Enum.GetValues(typeof(ControlType)).Length);
+				}
+			}
+			break;
 		case EventType.mouseDown:
-			if (current.button == 0) Painting(current);
+			if (current.button == 0 && !Lvl.boxTexRect.Contains(Event.current.mousePosition)) {
+				if (currControl == ControlType.TilePaint) PaintTile();
+				else if (currControl == ControlType.TileObject) PlaceTO();
+			}
 			//Event.current.Use();
 			break;
 		case EventType.mouseDrag:
-			if (current.button == 0) Painting(current);
+			if (current.button == 0 && currControl == ControlType.TilePaint) PaintTile();
 			//Event.current.Use();
 			break;
-		//case EventType.mouseDrag:
-		//	//Painting(current);
-		//	//Event.current.Use();
-		//	break;
 		case EventType.layout:
+			if (!Lvl.boxTexRect.Contains(Event.current.mousePosition) && currControl == ControlType.Disabled) break;
 			HandleUtility.AddDefaultControl(controlID);
 			break;
 		}
+
+		if (GUI.changed) {
+			Lvl.tileObjectPrefab = PrefabLibrary.I.TileObjectPrefabs[currTileObjectIdx];
+			//SetTODefintion((Object)Lvl.tileObjectPrefab.ToDef);
+			//SetTODefintion(TODefHolder);
+
+			Lvl.Map.CleanLists();
+
+			EditorUtility.SetDirty(Lvl);
+		}
     }
 
-	private void Painting(Event current) {
-		//Debug.Log("current.mousePosition: " + current.mousePosition + ", Camera.current: "+ Camera.current) ;
 
-		Vector2 mousePos = Event.current.mousePosition;
-        mousePos.y = Camera.current.pixelHeight - mousePos.y;
-        Vector3 position = Camera.current.ScreenPointToRay(mousePos).origin;
-		//Debug.Log("World pos?: " + position) ;
-
-		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Painted tile");
-		PaintTile(position);
+	private void NumberPressed(int number) {
+		Debug.Log("NumberPressed: " + number + ", shiftDown: "+ altDown + ", ctrlDown: "+ ctrlDown);
+		//if (altDown) {
+		//	TileColor typ= TileColor.None;
+		//	Lvl.tileColor = (TileColor) typ.SetToValueByNumber(number);
+		//} else if (ctrlDown) {
+		//	TileColor typ= TileColor.None;
+		//	Lvl.tileGoalColor = (TileColor) typ.SetToValueByNumber(number);
+		//} else {
+			TileType typ= TileType.Empty;
+			Debug.Log("typ.SetToValueByNumber(number): " + (TileType)typ.SetToValueByNumber(number));
+			Lvl.tileType = (TileType) typ.SetToValueByNumber(number);
+		//}
 	}
 
-	private void PaintTile(Vector2 pos) {
-		Vec2i tilePos = GameHelper.WorldToTilePos(pos);
+	private void PaintTile() {
+		//Debug.Log("[Level] current.mousePosition: " + current.mousePosition + ", Camera.current: " + Camera.current);
+		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Painted tile");
+		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
 		//Debug.Log("[Level] PaintTile - tilePos: " + tilePos);
-
 		if (Lvl.tileType != TileType.Empty) {
+			TileDefinition tileDef = new TileDefinition { type = Lvl.tileType, goalColor = Lvl.tileGoalColor, color = Lvl.tileColor, pos = tilePos };
 			if (Lvl.Map.IsValidTile(tilePos)) {
-				Lvl.Map.GetTile(tilePos).Set(Lvl.tileType, Lvl.tileColor);
+				Undo.RecordObject(Lvl.Map.GetTile(tilePos), "Painted tile");
+				Lvl.Map.SetTile(tilePos, tileDef);
 			} else {
-				
-				Lvl.CreateTileAtPos(tilePos);
-				Lvl.Map.GetTile(tilePos).Set(Lvl.tileType, Lvl.tileColor);
-
+				Lvl.CreateTileAtPos(tilePos, tileDef);
 				Undo.RegisterCreatedObjectUndo(Lvl.Map.GetTile(tilePos).gameObject, "Painted tile");
-
 			}
 		} else {
 			Lvl.Map.DeleteTileAt(tilePos);
 		}
-
-		
 	}
+
+	private void PlaceTO() {
+		Debug.Log("PlaceTO - .tileObjectPrefab: " + Lvl.tileObjectPrefab + ", .typ: " + Lvl.tileObjectPrefab.GetType());
+
+		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Placed tile object");
+		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
+		if (!Lvl.Map.HasTOTypeAtPos(tilePos, Lvl.tileObjectPrefab.GetType())) { //if tile not already contains type
+			string className = Lvl.tileObjectPrefab.GetType().FullName + ", " + Lvl.tileObjectPrefab.GetType().Assembly.GetName().Name;
+			//Lvl.tileObjectPrefab.ToDef
+			TileObjectDefintion toDef = new TileObjectDefintion { pos = tilePos, className = className };
+			Lvl.CreateTOAtPos(Lvl.tileObjectPrefab, toDef);
+		}
+	}
+
+
+	public System.Type GetTypeByName(string assemblyQualifiedClassName) {
+		System.Type typ = !string.IsNullOrEmpty(assemblyQualifiedClassName) ? System.Type.GetType(assemblyQualifiedClassName) : null;
+		return typ;
+	}
+
+	private Vector2 GetMouseWorldPos() {
+		Vector2 mousePos = Event.current.mousePosition;
+        mousePos.y = Camera.current.pixelHeight - mousePos.y;
+        return Camera.current.ScreenPointToRay(mousePos).origin;
+	}
+
 }
 
 

@@ -2,11 +2,16 @@
 using System.Collections;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class Tile : MonoBehaviour {
+public class Tile : ProBehaviour {
 
-	public TileDefinition tileDef;
+	[SerializeField] private TileDefinition tileDef;
+	public TileDefinition TileDef {
+		get { return tileDef; }
+	}
 
-	public Vec2i pos;
+	public Vec2i Pos {
+		get { return tileDef.pos; }
+	}
 
 	private SpriteRenderer sr;
 	private SpriteRenderer Sr{
@@ -16,13 +21,22 @@ public class Tile : MonoBehaviour {
 		}
 	}
 
-	public void Set(TileType tileType, TileColor color) {
-		tileDef.type = tileType;
-		tileDef.color = color;
+	[SerializeField] SpriteRenderer indicatorSR;
+
+
+	public void Set(TileDefinition def) {
+		tileDef.color = def.color;
+		tileDef.goalColor = def.goalColor;
+		tileDef.type = def.type;
+		tileDef.pos = def.pos;
+		tileDef.paintedTurn = def.paintedTurn;
 		Refresh();
 	}
 
 	public void Refresh(){
+		//Log("Hello!");
+		if (tileDef == null) return;
+
 		if (tileDef.type == TileType.Empty){
 			//Sr.enabled = false;	
 			Debug.LogError("Empty tileType?!");
@@ -30,6 +44,7 @@ public class Tile : MonoBehaviour {
 			Sr.enabled = true;	
 			Sr.sprite = SpriteLibrary.GetTileSprite(tileDef.type);
 			Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
+			indicatorSR.color = SpriteLibrary.GetTileColor(tileDef.goalColor);
 		}
 	}
 
@@ -40,7 +55,9 @@ public class Tile : MonoBehaviour {
 				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
 
 			}else{
-				float fracDry = 1f - (tileDef.paintedTurn + 5 - Game.I.Turn) / 5f;
+				//
+				//float fracDry = 1f - (tileDef.paintedTurn + GameRules.I.GetTimeToDry(tileDef.color) - Game.I.Turn) / 5f;
+				float fracDry = 1f - ((tileDef.paintedTurn + GameRules.I.GetTimeToDry(tileDef.color) < Game.I.Turn) ? 0f : 0.5f);
 				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
 				Sr.color = new Color(Sr.color.r*fracDry, Sr.color.g*fracDry, Sr.color.b*fracDry);
 			}

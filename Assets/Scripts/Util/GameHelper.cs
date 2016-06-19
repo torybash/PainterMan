@@ -14,7 +14,7 @@ public class GameHelper {
 		int yPos = Mathf.RoundToInt(pos.y / 1.5f);
 		int xPos = Mathf.RoundToInt(pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0));
 
-		Debug.Log("WorldToTilePos - pos: " + pos + " , (yPos % 2 == 1 ? Mathf.Sign(yPos) * 0.5f : 0): " + (pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0)) + ", xpos: " + xPos + " ypos: " + yPos);
+		//Debug.Log("WorldToTilePos - pos: " + pos + " , (yPos % 2 == 1 ? Mathf.Sign(yPos) * 0.5f : 0): " + (pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0)) + ", xpos: " + xPos + " ypos: " + yPos);
 		//float xPos = Mathf.Sqrt(3f) * pos.x + (pos.y % 2 == 1 ? Mathf.Sqrt(3f) / 2f : 0);
 		//Mathf.Sqrt(3f) * pos.x --> xPos - (pos.y % 2 == 1 ? Mathf.Sqrt(3f) / 2f : 0)
 		//float yPos = 1.5f * pos.y;
@@ -26,14 +26,18 @@ public class GameHelper {
 public class TileDefinition{
 	public TileType type = TileType.Normal;
 	public TileColor color = TileColor.None;
+	public TileColor goalColor = TileColor.None;
+	public Vec2i pos;
 
 	public int paintedTurn = -1;
 
+	public override string ToString() {
+		return "TileDefinition - type " + type + ", color: "+ color + ", goalColor: "+ goalColor + ", paintedTurn: "+ paintedTurn;
+	}
 }
 
 [System.Serializable]
 public enum TileType{
-
 	Empty		 		= 0,
 	Normal				,
 	Bucket				,

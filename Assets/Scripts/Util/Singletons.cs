@@ -15,8 +15,13 @@ public class Manager<T> : MonoBehaviour where T : MonoBehaviour {
 
 	private static object _lock = new object();
 
-	public static T Instance {
+	public static T I {
 		get {
+			if (!Application.isPlaying) {
+				Debug.LogError("[Manager] Managers should/can not be used in editor mode!");
+				return null;
+			}
+
 			if (Application.isPlaying && applicationIsQuitting) {
 				Debug.LogWarning("[Manager] Instance '" + typeof(T) +
                     "' already destroyed on application quit." +
@@ -70,12 +75,6 @@ public class Manager<T> : MonoBehaviour where T : MonoBehaviour {
 		Debug.Log("[Manager] OnDestroy - Application.isPlaying: "  +Application.isPlaying + " (_instance == this): " + (_instance == this));
 		if (Application.isPlaying && _instance == this)  applicationIsQuitting = true;
     }
-
-	void Awake(){
-		if (_instance != null && this != _instance){
-			DestroyImmediate(gameObject);
-		}
-	}
 }
 
 
@@ -156,7 +155,7 @@ public class Library<T> : MonoBehaviour where T : MonoBehaviour {
 
 
 
-public class Controller<T> : MonoBehaviour where T : MonoBehaviour {
+public class Controller<T> : ProBehaviour where T : ProBehaviour {
 	private static T _instance;
 
 	private static object _lock = new object();
