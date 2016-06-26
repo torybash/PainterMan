@@ -30,6 +30,10 @@ public class Spikes : TileObject {
 		Refresh();
 	}
 
+	public override TileObjectInteractionResult PlayerEntered() {
+		return new TileObjectInteractionResult { kill = spikesDef.isRaised };
+	}
+
 	private void Refresh() {
 		if (spikesDef == null || spikesRend == null) return;
 		if (spikesDef.isRaised) spikesRend.sprite = SpriteLibrary.GetSprite(raisedSpriteName);

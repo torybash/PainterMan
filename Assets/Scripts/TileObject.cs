@@ -14,23 +14,32 @@ public abstract class TileObject : MonoBehaviour{
 
 	}
 
+	public virtual TileObjectInteractionResult PlayerEntered() {
+		return TileObjectInteractionResult.Empty;
+	}
+
+	public virtual void Init() {
+
+	}
+
 }
 
 [System.Serializable]
 public class TileObjectDefintion {
-	public Vec2i pos;
-	public string className;
+	[ReadOnly] public Vec2i pos;
+	[ReadOnly] public string className;
 }
 
-//[System.Serializable]
-//public class TileObjectDefintionHolder : ScriptableObject { 
-////public class TileObjectDefintionHolder<T> : ScriptableObject where T : TileObjectDefintion, new(){
-//	public TileObjectDefintionHolder def;
 
-//	void OnEnable() {
-//        hideFlags = HideFlags.DontSave;
-//        if (def == null) {
-//			def = new TileObjectDefintionHolder();
-//		}
-//    }
-//}
+
+[System.Serializable]
+public class TileObjectInteractionResult {
+	public bool kill;
+
+	public static TileObjectInteractionResult Empty {
+		get {
+			var result = new TileObjectInteractionResult();
+			return result;
+		}
+	}
+}

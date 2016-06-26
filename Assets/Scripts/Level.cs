@@ -19,12 +19,19 @@ public class Level : ProBehaviour {
 	void Awake() {
 		tileMap.PrepareForBuild(); //TODO Do this in editor before building
 	}
+	
+	public void InitTileObjects() {
+		foreach (var to in tileMap.TOList) {
+			to.Init();
+		}
+	}
 
 	public void UpdateTileObjects() {
 		foreach (var to in tileMap.TOList) {
 			to.UpdateTO();
 		}
 	}
+
 
 	#region Loading/Unloading
 	public void UnloadMap() {
@@ -46,6 +53,9 @@ public class Level : ProBehaviour {
 	#region TileMap Wrappers
 	public Vec2i GetStartPos(){
 		return tileMap.GetTileOfType(TileType.Start).Pos;
+	}
+	public List<T> GetAllTOOfType<T>() where T : TileObject{
+		return tileMap.GetAllTOOfType<T>();
 	}
 	public Vector2 GetCenterPos() {
 		Vector4 extremes = new Vector4(float.MaxValue, float.MinValue, float.MaxValue, float.MinValue); //min x, max x, min y, max y
@@ -209,7 +219,7 @@ public class LevelEditor : Editor {
 	public string[] TileObjectNames {
 		get {
 			if (tileObjectNames == null) {
-				tileObjectNames = new string[PrefabLibrary.I.TileObjectPrefabs.Length];
+				tileObjectNames = new string[PrefabLibrary.I.TileObjectPrefabs.Count];
 				for (int i = 0; i < tileObjectNames.Length; i++) {
 					tileObjectNames[i] = PrefabLibrary.I.TileObjectPrefabs[i].GetType().Name;
 				}

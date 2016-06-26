@@ -149,5 +149,13 @@ public class TileMap {
 		return false;
 	}
 
+	public List<T> GetAllTOOfType<T>() where T : TileObject {
+		List<T> list = new List<T>();
+		foreach (T to in toList) {
+			if (to.GetType() == typeof(T)) list.Add(to);
+		}
+		return list;
+	}
+
 	#endregion TileObjects
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -8,8 +9,8 @@ using Object = UnityEngine.Object;
 public class PrefabLibrary : Library<PrefabLibrary> {
 
 	[SerializeField] Tile tilePrefab;
-	[SerializeField] TileObject[] tileObjectPrefabs;
-	public TileObject[] TileObjectPrefabs { get { return tileObjectPrefabs; } }
+	[SerializeField] List<TileObject> tileObjectPrefabs;
+	public List<TileObject> TileObjectPrefabs { get { return tileObjectPrefabs; } }
 
 	public Tile GetTileInstance() {
 		return InstantiatePrefab<Tile>(tilePrefab) ;
@@ -47,4 +48,22 @@ public class PrefabLibrary : Library<PrefabLibrary> {
 		}
 		return Instantiate<T>(prefab);
 	}
+
+
+#if UNITY_EDITOR
+	[SerializeField] DefaultAsset prefabDir;
+	void OnValidate() {
+		if (prefabDir != null) {
+			//tilePrefab, tileObjectPrefabs
+			tilePrefab = EditorHelper.GetFirstDirectoryAsset<Tile>(prefabDir);
+
+			tileObjectPrefabs.Clear();
+			foreach (var to in EditorHelper.GetDirectoryAssets<TileObject>(prefabDir, true)) {
+				//Debug.Log("to: " + to);
+				tileObjectPrefabs.Add(to);
+				//allSpritesList.Add(new SpriteDefinition { name = spr.name, sprite = spr });
+			}
+		}
+	}
+#endif
 }

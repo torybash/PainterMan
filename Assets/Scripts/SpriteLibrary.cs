@@ -31,7 +31,7 @@ public class SpriteLibrary : Library<SpriteLibrary> {
 	[SerializeField] List<ColorDefinition> tileColorList;
 
 	public static Sprite GetSprite(string name) {
-		UnityEngine.Debug.Log("GetSprite - name: " + name + ", I.allSpritesList.Exists((elem) => elem.name == name): "+ (I.allSpritesList.Exists((elem) => elem.name == name)));
+		//UnityEngine.Debug.Log("GetSprite - name: " + name + ", I.allSpritesList.Exists((elem) => elem.name == name): "+ (I.allSpritesList.Exists((elem) => elem.name == name)));
 
 		if (!I.allSpritesList.Exists((elem) => elem.name == name)) return null;
 		return I.allSpritesList.First((elem) => elem.name == name).sprite;
@@ -59,7 +59,7 @@ public class SpriteLibrary : Library<SpriteLibrary> {
 			if (allSpritesList == null) allSpritesList = new List<SpriteDefinition>();
 			allSpritesList.Clear();
 
-			List<Sprite> spriteList = GetDirectoryAssets<Sprite>(spritesDir);
+			List<Sprite> spriteList = EditorHelper.GetDirectoryAssets<Sprite>(spritesDir);
 			foreach (var spr in spriteList) {
 				allSpritesList.Add(new SpriteDefinition { name = spr.name, sprite = spr });
 			}

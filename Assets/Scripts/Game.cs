@@ -19,6 +19,9 @@ public class Game : Controller<Game> {
 
 	private int currLevelIdx;
 	private Level currLvl;
+	public Level Lvl {
+		get { return currLvl; }
+	}
 
 	private int turn = 0;
 	public int Turn{
@@ -39,6 +42,8 @@ public class Game : Controller<Game> {
 		currPlayerColor = TileColor.None;
 		playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(startPos) + currLvl.transform.position;
 		playerObj.GetComponent<SpriteRenderer>().color = SpriteLibrary.GetTileColor(currPlayerColor);
+
+		currLvl.InitTileObjects();
 
 		state = State.Normal;
 		turn = 0;
@@ -73,8 +78,7 @@ public class Game : Controller<Game> {
 	}
 
 	private void ExecuteTurn(Vec2i move, Vec2i endPos) {
-		Log("[Game] Move - move: "+ move + ", endPos: "+ endPos + ", endPos tile: "+ currLvl.GetTileType(endPos)); 
-
+		Log("Move - move: "+ move + ", endPos: "+ endPos + ", endPos tile: "+ currLvl.GetTileType(endPos)); 
 
 		//Set Player position, interact with end tile
 		playerPos = endPos;
@@ -114,13 +118,15 @@ public class Game : Controller<Game> {
 
 	private bool PlayerTOInteraction() {
 		foreach (var to in currLvl.Map.GetTileObjectsAtPos(playerPos)) {
-			if (to.GetType() == typeof(Spikes)) {
-				SpikesDefintion spikesDef = (SpikesDefintion)to.ToDef;
-				if (spikesDef.isRaised) {
-					LoseLevel();
-					return true;
-				}
-			}
+			to.PlayerEntered();
+
+			//if (to.GetType() == typeof(Spikes)) {
+			//	SpikesDefintion spikesDef = (SpikesDefintion)to.ToDef;
+			//	if (spikesDef.isRaised) {
+			//		LoseLevel();
+			//		return true;
+			//	}
+			//}
 		}
 		return false;
 	}
