@@ -8,8 +8,6 @@ public class Game : Controller<Game> {
 	public enum State { Disabled, Normal, Animating}
 
 	#region Variables
-	[SerializeField] List<Level> levelList;
-
 	[SerializeField] GameObject playerObj;
 
 	[SerializeField] [ReadOnly] private State state;
@@ -52,9 +50,8 @@ public class Game : Controller<Game> {
 
 	#region Level Managing
 	public void LoadLevel(int lvlIdx){
-		if (lvlIdx >=levelList.Count) { Debug.LogError("lvlIdx invalid:" + lvlIdx); return; }
 		currLevelIdx = lvlIdx;
-		currLvl = levelList[lvlIdx];
+		currLvl = LevelLibrary.I.InstantiateLevel(lvlIdx);
 		currLvl.LoadTiles();
 
 		GameUI.I.OpenMenu();
@@ -62,10 +59,6 @@ public class Game : Controller<Game> {
 		Camera.main.transform.position = (Vector3)currLvl.GetCenterPos() - Vector3.forward * 10f;
 
 		StartLevel();
-	}
-
-	public int GetLevelCount() {
-		return levelList.Count;
 	}
 	#endregion Level Managing
 
@@ -105,10 +98,10 @@ public class Game : Controller<Game> {
 		if (tileTyp == TileType.Bucket){
 			currPlayerColor = currLvl.GetTileColorType(playerPos);
 			playerObj.GetComponent<SpriteRenderer>().color = SpriteLibrary.GetTileColor(currPlayerColor);
-		}else{
-			if (currPlayerColor != TileColor.None){  //Paint tile, if not already painted OR if dry - with player color
-				currLvl.PaintTile(playerPos, currPlayerColor, turn);
-			}
+		}
+
+		if (currPlayerColor != TileColor.None){  //Paint tile, if not already painted OR if dry - with player color
+			if (tileTyp != TileType.Bucket || GameRules.I.PaintBucketTiles) currLvl.PaintTile(playerPos, currPlayerColor, turn);
 		}
 
 		if (tileTyp == TileType.Goal && currLvl.CheckForWin()){

@@ -10,8 +10,6 @@ using UnityEditor;
 public class Level : ProBehaviour {
 
 	#region Variables
-	[SerializeField] GameObject tilePrefab;
-
 	[SerializeField] TileMap tileMap;
 	public TileMap Map { get{ return tileMap;}}
 	#endregion Variables
@@ -126,6 +124,8 @@ public class Level : ProBehaviour {
 	#endregion TileMap Wrappers
 
 	#region Editor
+	[HideInInspector][SerializeField] public LevelEditor.ControlType currControl;
+
 	[HideInInspector][SerializeField] public TileType tileType; 
 	[HideInInspector][SerializeField] public TileColor tileGoalColor; 
 	[HideInInspector][SerializeField] public TileColor tileColor; 
@@ -135,6 +135,9 @@ public class Level : ProBehaviour {
 	[HideInInspector][SerializeField] public Texture boxTex; 
 	[HideInInspector][SerializeField] public Rect boxTexRect; 
 	[HideInInspector][SerializeField] GameObject tileCont;
+	[HideInInspector][SerializeField] GameObject toCont;
+
+
 	private GameObject TileCont {
 		get {
 			if (tileCont == null) {
@@ -144,7 +147,6 @@ public class Level : ProBehaviour {
 			return tileCont;
 		}
 	}
-	[HideInInspector][SerializeField] GameObject toCont;
 	private GameObject TOCont {
 		get {
 			if (toCont == null) {
@@ -187,6 +189,7 @@ public class Level : ProBehaviour {
 
 		tileMap.AddTileObject(toInst);
 	}
+
 	#endregion Editor
 
 }
@@ -198,8 +201,7 @@ public class Level : ProBehaviour {
 [CustomEditor(typeof(Level))]
 public class LevelEditor : Editor {
 
-	private enum ControlType { Disabled, TilePaint, TileObject}
-	private ControlType currControl = ControlType.Disabled;
+	public enum ControlType { Disabled, TilePaint, TileObject}
 
 	private int hintID = -1;
 	private int HintID {
@@ -227,6 +229,21 @@ public class LevelEditor : Editor {
 			return tileObjectNames;
 		}
 	}
+
+	void OnEnable()
+	{
+		Debug.Log("[LevelEditor] OnEnable");
+		Tools.hidden = true;
+		Lvl.Map.CleanLists();
+	}
+ 
+	void OnDisable()
+	{
+		Debug.Log("[LevelEditor] OnDisable");
+		Tools.hidden = false;
+		Lvl.Map.CleanLists();
+	}
+ 
 
 	//private SerializedObject toDefintionSO;
 	//private SerializedProperty toDefinitionProp;
@@ -287,16 +304,16 @@ public class LevelEditor : Editor {
 		GUILayout.BeginVertical();
 
 		GUILayout.BeginHorizontal();
-		EditorGUILayout.LabelField("" + (currControl == ControlType.Disabled ? ">>" : "") + "Disable", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
-		bool disabledToggle = EditorGUILayout.Toggle(currControl == ControlType.Disabled);
-		if (disabledToggle) currControl = ControlType.Disabled; 
+		EditorGUILayout.LabelField("" + (Lvl.currControl == ControlType.Disabled ? ">>" : "") + "Disable", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
+		bool disabledToggle = EditorGUILayout.Toggle(Lvl.currControl == ControlType.Disabled);
+		if (disabledToggle) Lvl.currControl = ControlType.Disabled; 
 		GUILayout.EndHorizontal();
 
 
 		GUILayout.BeginHorizontal();
-		EditorGUILayout.LabelField("" + (currControl == ControlType.TilePaint ? ">>" : "") + "Tile paint", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
-		bool paintToggle = EditorGUILayout.Toggle(currControl == ControlType.TilePaint);
-		if (paintToggle) currControl = ControlType.TilePaint; 
+		EditorGUILayout.LabelField("" + (Lvl.currControl == ControlType.TilePaint ? ">>" : "") + "Tile paint", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
+		bool paintToggle = EditorGUILayout.Toggle(Lvl.currControl == ControlType.TilePaint);
+		if (paintToggle) Lvl.currControl = ControlType.TilePaint; 
 		GUILayout.EndHorizontal();
 		Lvl.tileType = (TileType)EditorGUILayout.EnumPopup(Lvl.tileType);
 		if (SpriteLibrary.GetTileSprite(Lvl.tileType) != null) {
@@ -314,9 +331,9 @@ public class LevelEditor : Editor {
 		EditorGUILayout.Space();
 		GUILayout.BeginHorizontal();
 
-		EditorGUILayout.LabelField("" + (currControl == ControlType.TileObject?">>":"") +"Tile objects", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
-		bool toToggle = EditorGUILayout.Toggle(currControl == ControlType.TileObject);
-		if (toToggle) currControl = ControlType.TileObject; 
+		EditorGUILayout.LabelField("" + (Lvl.currControl == ControlType.TileObject?">>":"") +"Tile objects", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
+		bool toToggle = EditorGUILayout.Toggle(Lvl.currControl == ControlType.TileObject);
+		if (toToggle) Lvl.currControl = ControlType.TileObject; 
 		GUILayout.EndHorizontal();
 
 		currTileObjectIdx = EditorGUILayout.Popup(currTileObjectIdx, TileObjectNames);
@@ -358,41 +375,46 @@ public class LevelEditor : Editor {
 				current.Use();
 			} else {
 				if (current.keyCode == KeyCode.Tab) {
-					currControl = (ControlType)((((int)currControl) + 1)%System.Enum.GetValues(typeof(ControlType)).Length);
+					Lvl.currControl = (ControlType)((((int)Lvl.currControl) + 1)%System.Enum.GetValues(typeof(ControlType)).Length);
+				}else if (current.keyCode == KeyCode.R) { Lvl.tileGoalColor = TileColor.Red; 
+				}else if (current.keyCode == KeyCode.G) { Lvl.tileGoalColor = TileColor.Green;
+				}else if (current.keyCode == KeyCode.B) { Lvl.tileGoalColor = TileColor.Blue;
+				}else if (current.keyCode == KeyCode.N) { Lvl.tileGoalColor = TileColor.None;
+				}else if (current.keyCode == KeyCode.C) { Lvl.tileGoalColor = TileColor.Cyan;
+				}else if (current.keyCode == KeyCode.M) { Lvl.tileGoalColor = TileColor.Magneta;
+				}else if (current.keyCode == KeyCode.Y) { Lvl.tileGoalColor = TileColor.Yellow;
 				}
 			}
+			GUI.changed = true;
 			break;
 		case EventType.mouseDown:
 			if (current.button == 0 && !Lvl.boxTexRect.Contains(Event.current.mousePosition)) {
-				if (currControl == ControlType.TilePaint) PaintTile();
-				else if (currControl == ControlType.TileObject) PlaceTO();
+				if (Lvl.currControl == ControlType.TilePaint) PaintTile();
+				else if (Lvl.currControl == ControlType.TileObject) PlaceTO();
 			}
-			//Event.current.Use();
+			GUI.changed = true;
 			break;
 		case EventType.mouseDrag:
-			if (current.button == 0 && currControl == ControlType.TilePaint) PaintTile();
-			//Event.current.Use();
+			if (current.button == 0 && Lvl.currControl == ControlType.TilePaint) PaintTile();
+			GUI.changed = true;
 			break;
 		case EventType.layout:
-			if (!Lvl.boxTexRect.Contains(Event.current.mousePosition) && currControl == ControlType.Disabled) break;
+			if (!Lvl.boxTexRect.Contains(Event.current.mousePosition) && Lvl.currControl == ControlType.Disabled) break;
 			HandleUtility.AddDefaultControl(controlID);
 			break;
 		}
 
+
 		if (GUI.changed) {
 			Lvl.tileObjectPrefab = PrefabLibrary.I.TileObjectPrefabs[currTileObjectIdx];
-			//SetTODefintion((Object)Lvl.tileObjectPrefab.ToDef);
-			//SetTODefintion(TODefHolder);
-
 			Lvl.Map.CleanLists();
-
 			EditorUtility.SetDirty(Lvl);
 		}
     }
 
 
 	private void NumberPressed(int number) {
-		Debug.Log("NumberPressed: " + number + ", shiftDown: "+ altDown + ", ctrlDown: "+ ctrlDown);
+		D.Log("[LevelEditor] NumberPressed: " + number + ", shiftDown: "+ altDown + ", ctrlDown: "+ ctrlDown);
 		//if (altDown) {
 		//	TileColor typ= TileColor.None;
 		//	Lvl.tileColor = (TileColor) typ.SetToValueByNumber(number);
@@ -449,6 +471,7 @@ public class LevelEditor : Editor {
         mousePos.y = Camera.current.pixelHeight - mousePos.y;
         return Camera.current.ScreenPointToRay(mousePos).origin;
 	}
+
 
 }
 

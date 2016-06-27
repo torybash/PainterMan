@@ -119,9 +119,9 @@ public class Library<T> : MonoBehaviour where T : MonoBehaviour {
 							Debug.LogWarning("[Library] No prefab for "+ typeof(T).ToString()+" found at location: Resources/"+ path);
 							return _instance;
 						}
-						if (!Application.isPlaying){
+						//if (!Application.isPlaying){ TODO? Is ok to use as prefab in builds?
 							return prefabObj;
-						}
+						//}
 
 						_instance = Instantiate(prefabObj).GetComponent<T>();
 						_instance.gameObject.name = "(Library) " + typeof(T).ToString();

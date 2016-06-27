@@ -54,6 +54,10 @@ public enum TileColor{
 	Red					,
 	Green				,
 	Blue				,
+
+	Cyan				,
+	Magneta				,
+	Yellow				,
 }
 
 [System.Serializable]

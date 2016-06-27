@@ -17,7 +17,8 @@ public class D {
 
     public static bool _initialized = false;
 
-    private const string dataPath = "Assets/DBG/DBGTags.asset";
+	private const string assetPath = "Assets/Extras/DBG/Resources/DBGTags.asset";
+	private const string resourcePath = "DBGTags";
 
     public static void Init() {
         Debug.Log("Initializing D!");
@@ -36,16 +37,19 @@ public class D {
     }
 
     private static void SetDBGTagReference() {
-
+		
+		//DBGTags dbgTags = AssetDatabase.LoadAssetAtPath<DBGTags>(dataPath);
+		DBGTags dbgTags = Resources.Load<DBGTags>(resourcePath);;
 #if UNITY_EDITOR
-        ScriptableObject dbgTags = AssetDatabase.LoadAssetAtPath<DBGTags>(dataPath);
+       
         if (dbgTags == null) {
             dbgTags = ScriptableObject.CreateInstance<DBGTags>();
-            AssetDatabase.CreateAsset(dbgTags, dataPath);
+            AssetDatabase.CreateAsset(dbgTags, assetPath);
         }
-        UnityDBG.DBG.DbgTags = (UnityDBG.DBGTags)dbgTags;
 #endif
+        UnityDBG.DBG.DbgTags = dbgTags;
     }
+
 
 
     private static void Check(){

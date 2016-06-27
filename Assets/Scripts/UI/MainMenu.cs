@@ -50,7 +50,7 @@ public class MainMenu : Controller<MainMenu> {
 		foreach (var item in levelButtonList) if (item) Destroy(item.gameObject);
 		levelButtonList.Clear();
 
-		for (int i = 0; i < Game.I.GetLevelCount(); i++) {
+		for (int i = 0; i < LevelLibrary.I.GetLevelCount(); i++) {
 			UI_LevelButton lvlBtn = Instantiate<UI_LevelButton>(levelButtonTemplate);
 			lvlBtn.transform.SetParent(levelSelectGroup);
 			lvlBtn.transform.localScale = Vector3.one;

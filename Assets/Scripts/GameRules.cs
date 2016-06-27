@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public class GameRules : Library<GameRules> {
 
+	[SerializeField] bool paintBucketTiles;
+	public bool PaintBucketTiles {
+		get { return paintBucketTiles; }
+	}
 	[SerializeField] private ColorDefinitions colorDefinitions;
 
 	[System.Serializable]
