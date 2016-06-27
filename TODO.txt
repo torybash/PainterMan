@@ -1,2 +1,11 @@
 TODO:
-Stuff!
+
+Graphics:
+
+-Gradually trying paint (like previously). Currently the paint is either try or wet. 
+
+Level Editor:
+
+Nice to have - Would it be possible that if you click on a tile it applies the properties of the tile to the level editor? For example if I select a red tile with a paint bucket the level editor automatically adjusts to the settings of the tile and I won’t have to select the red paint bucket from the drop-down menu. 
+Maybe the feature could be toggled on and off. 
+
