@@ -33,6 +33,7 @@ public class Game : Controller<Game> {
 	void Update(){
 		if (state != State.Normal) return;
 		Vec2i move = InputManager.I.InputUpdate(playerPos.y % 2 == 0);
+
 		if (move != Vec2i.Zero) TryMovePlayer(move);
 	}
 
@@ -69,7 +70,8 @@ public class Game : Controller<Game> {
 	#endregion Level Managing
 
 
-	private void TryMovePlayer(Vec2i move){
+	private void TryMovePlayer(Vec2i move) { 
+
 		Vec2i endPos = playerPos + move;
 		Log("TryMovePlayer - move: " + move + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
 		if (currLvl.IsValidTile(endPos) && currLvl.IsWalkable(endPos, turn)){
@@ -118,15 +120,31 @@ public class Game : Controller<Game> {
 
 	private bool PlayerTOInteraction() {
 		foreach (var to in currLvl.Map.GetTileObjectsAtPos(playerPos)) {
-			to.PlayerEntered();
+			var result = to.PlayerEntered();
+			switch (result.type) {
+			case TileObjectInteractionResultType.Kill:
+				LoseLevel();
+				return true;
 
-			//if (to.GetType() == typeof(Spikes)) {
-			//	SpikesDefintion spikesDef = (SpikesDefintion)to.ToDef;
-			//	if (spikesDef.isRaised) {
-			//		LoseLevel();
-			//		return true;
-			//	}
-			//}
+			case TileObjectInteractionResultType.Teleport:
+				//Set Player position, interact with end tile
+				playerPos = result.position;
+				playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(result.position) + currLvl.transform.position;
+
+				// interact with end tile
+				if (PlayerTileInteraction()) return true;
+				break;
+
+			default: break;
+			}
+			 //if (result.kill)
+			 //if (to.GetType() == typeof(Spikes)) {
+			 //	SpikesDefintion spikesDef = (SpikesDefintion)to.ToDef;
+			 //	if (spikesDef.isRaised) {
+			 //		LoseLevel();
+			 //		return true;
+			 //	}
+			 //}
 		}
 		return false;
 	}

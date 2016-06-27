@@ -11,9 +11,10 @@ public class ProBehaviour : MonoBehaviour {
     public static DebugLogger LogDelegate;
 	public static bool _initialized = false;
 
-    private const string dataPath = "Assets/Extras/DBG/DBGTags.asset";
+	private const string assetPath = "Assets/Extras/DBG/Resources/DBGTags.asset";
+	private const string resourcePath = "DBGTags";
 
-    public static void Init() {
+	public static void Init() {
         Debug.Log("Initializing ProBehaviour!");
 
 		//LogDelegate += UnityDBG.DBG.Log;
@@ -33,30 +34,44 @@ public class ProBehaviour : MonoBehaviour {
 	 private void Check(string tag){
         if (!_initialized) Init();
 		if (DBG.DbgTags == null) SetDBGTagReference();
+
+		#if UNITY_EDITOR
 		if (DBG.DbgTags.GetTag(tag) == null) {
-			DBG.DbgTags.tags.Add(new DBGTag { tag = tag });
-#if UNITY_EDITOR
+			DBG.DbgTags.tags.Add(new DBGTag { tag = tag, color = GetNewTagColor(), show = true });
 			AssetDatabase.SaveAssets();
-#endif
 		}
+		#endif
+	}
+
+	private Color GetNewTagColor() {
+		Color newColor = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
+		if (DBG.DbgTags != null) { //TODO clever stuff
+			foreach (var tag in DBG.DbgTags.tags) {
+				//tag.color
+			}
+		}
+		return newColor;
 	}
 
     private static void SetDBGTagReference() {
+		
+		//DBGTags dbgTags = AssetDatabase.LoadAssetAtPath<DBGTags>(dataPath);
+		DBGTags dbgTags = Resources.Load<DBGTags>(resourcePath);;
 #if UNITY_EDITOR
-        ScriptableObject dbgTags = AssetDatabase.LoadAssetAtPath<DBGTags>(dataPath);
+       
         if (dbgTags == null) {
             dbgTags = ScriptableObject.CreateInstance<DBGTags>();
-            AssetDatabase.CreateAsset(dbgTags, dataPath);
+            AssetDatabase.CreateAsset(dbgTags, assetPath);
         }
-        UnityDBG.DBG.DbgTags = (UnityDBG.DBGTags)dbgTags;
 #endif
+        UnityDBG.DBG.DbgTags = dbgTags;
     }
 
 
 	public DebugLogger Log {
         get {
 			string tag = "[" + this.GetType() +"] ";
-            Check(this.GetType().ToString());
+			Check(this.GetType().ToString());
 			UnityDBG.DBG.PrepareLog(tag);
             return LogDelegate;
         }

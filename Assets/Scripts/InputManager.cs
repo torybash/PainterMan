@@ -59,7 +59,6 @@ public class InputManager : Manager<InputManager> {
 
 	private Vec2i TouchInput(bool evenYPos) {
 		Vec2i move = Vec2i.Zero;
-
 		if (Application.isMobilePlatform) {
 			if (Input.touchCount > 0) {
 				Touch touch = Input.touches[0];
@@ -71,6 +70,7 @@ public class InputManager : Manager<InputManager> {
 					Vector2 diffVec = touch.position - startTouchPos;
 					if (diffVec.magnitude > touchMinMove) {
 						move = InputHelper.GetMoveFromVector(diffVec, evenYPos);
+
 					}
 					break;
 				default:

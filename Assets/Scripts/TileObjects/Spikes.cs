@@ -31,7 +31,10 @@ public class Spikes : TileObject {
 	}
 
 	public override TileObjectInteractionResult PlayerEntered() {
-		return new TileObjectInteractionResult { kill = spikesDef.isRaised };
+		if (spikesDef.isRaised) {
+			return TileObjectInteractionResult.KillResult();
+		}
+		return TileObjectInteractionResult.Empty();
 	}
 
 	private void Refresh() {

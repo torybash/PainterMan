@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public abstract class TileObject : MonoBehaviour{
 
@@ -15,7 +15,7 @@ public abstract class TileObject : MonoBehaviour{
 	}
 
 	public virtual TileObjectInteractionResult PlayerEntered() {
-		return TileObjectInteractionResult.Empty;
+		return TileObjectInteractionResult.Empty();
 	}
 
 	public virtual void Init() {
@@ -34,12 +34,26 @@ public class TileObjectDefintion {
 
 [System.Serializable]
 public class TileObjectInteractionResult {
-	public bool kill;
 
-	public static TileObjectInteractionResult Empty {
-		get {
-			var result = new TileObjectInteractionResult();
-			return result;
-		}
+	public TileObjectInteractionResultType type;
+	public Vec2i position;
+
+	public static TileObjectInteractionResult Empty() {
+		return new TileObjectInteractionResult();
 	}
+
+	public static TileObjectInteractionResult TeleportResult(Vec2i endPos) {
+		return new TileObjectInteractionResult { type = TileObjectInteractionResultType.Teleport, position = endPos };
+	}
+
+	public static TileObjectInteractionResult KillResult() {
+		return new TileObjectInteractionResult { type = TileObjectInteractionResultType.Kill};
+	}
+}
+
+[System.Serializable]
+public enum TileObjectInteractionResultType {
+	None,
+	Kill,
+	Teleport
 }

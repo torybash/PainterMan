@@ -5,14 +5,16 @@ public class GameHelper {
 
 
 	public static Vector2 TileToWorldPos(Vec2i pos){
-		float xPos = Mathf.Sqrt(3f) * pos.x + (Mathf.Abs(pos.y % 2) == 1 ? Mathf.Sign(pos.y) * Mathf.Sqrt(3f)/2f : 0);
+		//float xPos = Mathf.Sqrt(3f) * pos.x + (Mathf.Abs(pos.y % 2) == 1 ? Mathf.Sign(pos.y) * Mathf.Sqrt(3f)/2f : 0);
+		float xPos = Mathf.Sqrt(3f) * pos.x + (Mathf.Abs(pos.y % 2) == 1 ? Mathf.Sqrt(3f)/2f : 0);
 		float yPos = 1.5f * pos.y;
 		return new Vector2(xPos, yPos);
 	}
 
 	public static Vec2i WorldToTilePos(Vector2 pos) {
 		int yPos = Mathf.RoundToInt(pos.y / 1.5f);
-		int xPos = Mathf.RoundToInt(pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0));
+		//int xPos = Mathf.RoundToInt(pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0));
+		int xPos = Mathf.RoundToInt(pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? 1f * 0.5f : 0));
 
 		//Debug.Log("WorldToTilePos - pos: " + pos + " , (yPos % 2 == 1 ? Mathf.Sign(yPos) * 0.5f : 0): " + (pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0)) + ", xpos: " + xPos + " ypos: " + yPos);
 		//float xPos = Mathf.Sqrt(3f) * pos.x + (pos.y % 2 == 1 ? Mathf.Sqrt(3f) / 2f : 0);

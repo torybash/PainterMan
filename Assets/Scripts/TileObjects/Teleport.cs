@@ -19,9 +19,11 @@ public class Teleport : TileObject {
 		foreach (var teleport in Game.I.Lvl.GetAllTOOfType<Teleport>()) {
 			TeleportDefinition teleportDef = (TeleportDefinition)teleport.ToDef;
 			int cycleIdx = teleportDef.teleportCycleIdx;
-			if (cycleIdx >= teleportCycles.Length) {
+			if (cycleIdx + 1 >= teleportCycles.Length) {
 				Array.Resize<TeleportCycle>(ref teleportCycles, cycleIdx + 1);
 			}
+			if (teleportCycles[cycleIdx] == null) teleportCycles[cycleIdx] = new TeleportCycle();
+			if (teleportCycles[cycleIdx].teleportList == null) teleportCycles[cycleIdx].teleportList = new List<Teleport>();
 			teleportCycles[cycleIdx].teleportList.Add(teleport);
 		}
 	}
@@ -37,12 +39,19 @@ public class Teleport : TileObject {
 	}
 
 	public override TileObjectInteractionResult PlayerEntered() {
-		//return new TileObjectInteractionResult { kill = spikesDef.isRaised };
-		return TileObjectInteractionResult.Empty;
+		if (teleportCycles == null || teleportCycles.Length <= def.teleportCycleIdx) {
+			Debug.LogError("teleportCycles not created??");
+			return TileObjectInteractionResult.Empty();
+		}
+		Vec2i teleportPos = Vec2i.Zero;
+		int thisTPIdx = teleportCycles[def.teleportCycleIdx].teleportList.IndexOf(this);
+		if (thisTPIdx + 1 == teleportCycles[def.teleportCycleIdx].teleportList.Count) teleportPos = teleportCycles[def.teleportCycleIdx].teleportList[0].def.pos;
+		else teleportPos = teleportCycles[def.teleportCycleIdx].teleportList[thisTPIdx + 1].def.pos;
+		return TileObjectInteractionResult.TeleportResult(teleportPos);
 	}
 
 	public override void Init() {
-		
+		MakeCycles();
 	}
 }
 

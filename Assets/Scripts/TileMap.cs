@@ -151,8 +151,8 @@ public class TileMap {
 
 	public List<T> GetAllTOOfType<T>() where T : TileObject {
 		List<T> list = new List<T>();
-		foreach (T to in toList) {
-			if (to.GetType() == typeof(T)) list.Add(to);
+		foreach (TileObject to in toList) {
+			if (to.GetType() == typeof(T)) list.Add((T)to);
 		}
 		return list;
 	}
