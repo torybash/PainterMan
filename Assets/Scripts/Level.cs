@@ -292,12 +292,13 @@ public class LevelEditor : Editor {
 
 		#region Handles GUI
 		Handles.BeginGUI( );
-		Rect rect = new Rect(0, 0, 150, Screen.height / 2f);
+		Rect rect = new Rect(0, 0, 150, Screen.height);
 		if (Lvl.boxTex != null) {
 			//Debug.Log("Lvl.boxTexRect: " + Lvl.boxTexRect);
 			GUI.color = new Color32(255, 255, 255, 127);
 			GUI.Box(Lvl.boxTexRect, Lvl.boxTex);
 			GUI.color = Color.white;
+			rect = Lvl.boxTexRect;
 		}
 		GUILayout.BeginArea(rect);
 
