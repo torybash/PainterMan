@@ -46,10 +46,16 @@ public class Tile : ProBehaviour {
 			Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
 			indicatorSR.color = SpriteLibrary.GetTileColor(tileDef.goalColor);
 		}
+
+		RefreshPaintColor();
 	}
 
 
 	void Update(){ //TODO DO SOMEWHERE ELSE (NOT IN UPDATE!!!)
+		RefreshPaintColor();
+	}
+
+	private void RefreshPaintColor() {
 		if (tileDef.color != TileColor.None && tileDef.paintedTurn >= 0) { //&& tileDef.type != TileType.Bucket){
 			if (tileDef.paintedTurn + 5 <= Game.I.Turn){
 				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);

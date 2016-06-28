@@ -75,6 +75,12 @@ MonoBehaviour:
     color: {r: 0.042820074, g: 0.64705884, b: 0.2470112, a: 1}
   - colorType: 3
     color: {r: 0.45512545, g: 0.45817325, b: 0.89705884, a: 1}
+  - colorType: 4
+    color: {r: 0.05401168, g: 0.8161765, b: 0.8161765, a: 1}
+  - colorType: 5
+    color: {r: 0.8014706, g: 0.19447447, b: 0.8014706, a: 1}
+  - colorType: 6
+    color: {r: 0.9485294, g: 0.9485294, b: 0.21620889, a: 1}
   spritesDir: {fileID: 102900000, guid: 04f6affffccfb4d029202f696c0ae140, type: 3}
 --- !u!1001 &100100000
 Prefab:

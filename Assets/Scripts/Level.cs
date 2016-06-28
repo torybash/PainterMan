@@ -173,11 +173,14 @@ public class Level : ProBehaviour {
 		TileObject toInst = PrefabLibrary.I.GetTileObject(typ);
 		InitTO(toInst, toDef);
 	}
-	public void CreateTOAtPos<T>(T tileObject, TileObjectDefintion toDef) where T : TileObject{
+	public TileObject CreateTOAtPos<T>(T tileObject, TileObjectDefintion toDef) where T : TileObject{
 		//Log("CreateTileObjectAtPos: " + to + ", " + pos + ", typeof(T): " + typeof(T) + ", totype: "+ to.GetType());
 		TileObject toInst = PrefabLibrary.I.GetTileObject(tileObject);
 		InitTO(toInst, toDef);
+		return toInst;
 	}
+
+
 
 	private void InitTO(TileObject toInst, TileObjectDefintion toDef) {
 		toInst.Set(toDef);
@@ -361,9 +364,8 @@ public class LevelEditor : Editor {
 
 		GUILayout.EndArea();
 		Handles.EndGUI();
-#endregion Handles GUI
+		#endregion Handles GUI
 
-		
 
 		switch (current.type) {
 		case EventType.keyDown:
@@ -376,27 +378,49 @@ public class LevelEditor : Editor {
 				current.Use();
 			} else {
 				if (current.keyCode == KeyCode.Tab) {
-					Lvl.currControl = (ControlType)((((int)Lvl.currControl) + 1)%System.Enum.GetValues(typeof(ControlType)).Length);
-				}else if (current.keyCode == KeyCode.R) { Lvl.tileGoalColor = TileColor.Red; 
-				}else if (current.keyCode == KeyCode.G) { Lvl.tileGoalColor = TileColor.Green;
-				}else if (current.keyCode == KeyCode.B) { Lvl.tileGoalColor = TileColor.Blue;
-				}else if (current.keyCode == KeyCode.N) { Lvl.tileGoalColor = TileColor.None;
-				}else if (current.keyCode == KeyCode.C) { Lvl.tileGoalColor = TileColor.Cyan;
-				}else if (current.keyCode == KeyCode.M) { Lvl.tileGoalColor = TileColor.Magneta;
-				}else if (current.keyCode == KeyCode.Y) { Lvl.tileGoalColor = TileColor.Yellow;
+					Lvl.currControl = (ControlType)((((int)Lvl.currControl) + 1) % System.Enum.GetValues(typeof(ControlType)).Length);
+				} else if (current.keyCode == KeyCode.R) {
+					Lvl.tileGoalColor = TileColor.Red;
+				} else if (current.keyCode == KeyCode.G) {
+					Lvl.tileGoalColor = TileColor.Green;
+				} else if (current.keyCode == KeyCode.B) {
+					Lvl.tileGoalColor = TileColor.Blue;
+				} else if (current.keyCode == KeyCode.N) {
+					Lvl.tileGoalColor = TileColor.None;
+				} else if (current.keyCode == KeyCode.C) {
+					Lvl.tileGoalColor = TileColor.Cyan;
+				} else if (current.keyCode == KeyCode.M) {
+					Lvl.tileGoalColor = TileColor.Magneta;
+				} else if (current.keyCode == KeyCode.Y) {
+					Lvl.tileGoalColor = TileColor.Yellow;
 				}
 			}
 			GUI.changed = true;
 			break;
 		case EventType.mouseDown:
-			if (current.button == 0 && !Lvl.boxTexRect.Contains(Event.current.mousePosition)) {
-				if (Lvl.currControl == ControlType.TilePaint) PaintTile();
-				else if (Lvl.currControl == ControlType.TileObject) PlaceTO();
+			if (!Lvl.boxTexRect.Contains(Event.current.mousePosition)) {
+				if (current.button == 0) {
+					if (Lvl.currControl == ControlType.TilePaint) PaintTile();
+					else if (Lvl.currControl == ControlType.TileObject) PlaceTO();
+				} else if (current.button == 1) {
+					if (Lvl.currControl == ControlType.TilePaint) DeleteTile();
+					else if (Lvl.currControl == ControlType.TileObject) DeleteTO();
+				}
 			}
 			GUI.changed = true;
 			break;
 		case EventType.mouseDrag:
-			if (current.button == 0 && Lvl.currControl == ControlType.TilePaint) PaintTile();
+			if (!Lvl.boxTexRect.Contains(Event.current.mousePosition)) {
+				if (current.button == 0) {
+					if (Lvl.currControl == ControlType.TilePaint) PaintTile();
+					else if (Lvl.currControl == ControlType.TileObject) PlaceTO();
+					Event.current.Use();
+				} else if (current.button == 1) {
+					if (Lvl.currControl == ControlType.TilePaint) DeleteTile();
+					else if (Lvl.currControl == ControlType.TileObject) DeleteTO();
+					Event.current.Use();
+				}
+			}
 			GUI.changed = true;
 			break;
 		case EventType.layout:
@@ -404,7 +428,6 @@ public class LevelEditor : Editor {
 			HandleUtility.AddDefaultControl(controlID);
 			break;
 		}
-
 
 		if (GUI.changed) {
 			Lvl.tileObjectPrefab = PrefabLibrary.I.TileObjectPrefabs[currTileObjectIdx];
@@ -430,12 +453,11 @@ public class LevelEditor : Editor {
 	}
 
 	private void PaintTile() {
-		//Debug.Log("[Level] current.mousePosition: " + current.mousePosition + ", Camera.current: " + Camera.current);
 		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Painted tile");
 		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
 		//Debug.Log("[Level] PaintTile - tilePos: " + tilePos);
 		if (Lvl.tileType != TileType.Empty) {
-			TileDefinition tileDef = new TileDefinition { type = Lvl.tileType, goalColor = Lvl.tileGoalColor, color = Lvl.tileColor, pos = tilePos };
+			TileDefinition tileDef = new TileDefinition { type = Lvl.tileType, goalColor = Lvl.tileGoalColor, color = (Lvl.tileType == TileType.Bucket ? Lvl.tileGoalColor : Lvl.tileColor), pos = tilePos };
 			if (Lvl.Map.IsValidTile(tilePos)) {
 				Undo.RecordObject(Lvl.Map.GetTile(tilePos), "Painted tile");
 				Lvl.Map.SetTile(tilePos, tileDef);
@@ -446,21 +468,40 @@ public class LevelEditor : Editor {
 		} else {
 			Lvl.Map.DeleteTileAt(tilePos);
 		}
+
+		current.Use();
+	}
+
+	private void DeleteTile() {
+		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Deleted tile");
+		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
+		Lvl.Map.DeleteTileAt(tilePos);
+
+		current.Use();
 	}
 
 	private void PlaceTO() {
 		Debug.Log("PlaceTO - .tileObjectPrefab: " + Lvl.tileObjectPrefab + ", .typ: " + Lvl.tileObjectPrefab.GetType());
 
-		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Placed tile object");
+		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Placed TileObject");
 		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
 		if (!Lvl.Map.HasTOTypeAtPos(tilePos, Lvl.tileObjectPrefab.GetType())) { //if tile not already contains type
 			string className = Lvl.tileObjectPrefab.GetType().FullName + ", " + Lvl.tileObjectPrefab.GetType().Assembly.GetName().Name;
 			//Lvl.tileObjectPrefab.ToDef
 			TileObjectDefintion toDef = new TileObjectDefintion { pos = tilePos, className = className };
-			Lvl.CreateTOAtPos(Lvl.tileObjectPrefab, toDef);
+			TileObject to = Lvl.CreateTOAtPos(Lvl.tileObjectPrefab, toDef);
+			Undo.RegisterCreatedObjectUndo(to.gameObject, "Create TileObject");
 		}
+
+		current.Use();
 	}
 
+	private void DeleteTO() {
+		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
+		Lvl.Map.DeleteAllTOAtPos(tilePos);
+
+		current.Use();
+	}
 
 	public System.Type GetTypeByName(string assemblyQualifiedClassName) {
 		System.Type typ = !string.IsNullOrEmpty(assemblyQualifiedClassName) ? System.Type.GetType(assemblyQualifiedClassName) : null;

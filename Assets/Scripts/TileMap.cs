@@ -157,5 +157,14 @@ public class TileMap {
 		return list;
 	}
 
+	public void DeleteAllTOAtPos(Vec2i pos) {
+		foreach (var to in GetTileObjectsAtPos(pos)) {
+			toList.Remove(to);
+#if UNITY_EDITOR
+			Undo.DestroyObjectImmediate(to.gameObject);
+#endif
+		}
+	}
+
 	#endregion TileObjects
 }
