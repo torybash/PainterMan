@@ -379,6 +379,7 @@ public class LevelEditor : Editor {
 			} else {
 				if (current.keyCode == KeyCode.Tab) {
 					Lvl.currControl = (ControlType)((((int)Lvl.currControl) + 1) % System.Enum.GetValues(typeof(ControlType)).Length);
+
 				} else if (current.keyCode == KeyCode.R) {
 					Lvl.tileGoalColor = TileColor.Red;
 				} else if (current.keyCode == KeyCode.G) {
@@ -387,14 +388,21 @@ public class LevelEditor : Editor {
 					Lvl.tileGoalColor = TileColor.Blue;
 				} else if (current.keyCode == KeyCode.N) {
 					Lvl.tileGoalColor = TileColor.None;
+
 				} else if (current.keyCode == KeyCode.C) {
 					Lvl.tileGoalColor = TileColor.Cyan;
 				} else if (current.keyCode == KeyCode.M) {
 					Lvl.tileGoalColor = TileColor.Magneta;
 				} else if (current.keyCode == KeyCode.Y) {
 					Lvl.tileGoalColor = TileColor.Yellow;
+
+				} else if (current.keyCode == KeyCode.Q) {
+					Lvl.tileGoalColor = (TileColor)((((int)Lvl.tileGoalColor) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
+				} else if (current.keyCode == KeyCode.W) {
+					Lvl.tileGoalColor = (TileColor)(((int)Lvl.tileGoalColor) - 1 < 0 ? System.Enum.GetValues(typeof(TileColor)).Length - 1 : ((int)Lvl.tileGoalColor) - 1);
 				}
 			}
+			Event.current.Use();
 			GUI.changed = true;
 			break;
 		case EventType.mouseDown:
@@ -447,7 +455,7 @@ public class LevelEditor : Editor {
 		//	Lvl.tileGoalColor = (TileColor) typ.SetToValueByNumber(number);
 		//} else {
 			TileType typ= TileType.Empty;
-			Debug.Log("typ.SetToValueByNumber(number): " + (TileType)typ.SetToValueByNumber(number));
+			//Debug.Log("typ.SetToValueByNumber(number): " + (TileType)typ.SetToValueByNumber(number));
 			Lvl.tileType = (TileType) typ.SetToValueByNumber(number);
 		//}
 	}
