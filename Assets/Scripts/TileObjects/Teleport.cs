@@ -53,10 +53,23 @@ public class Teleport : TileObject {
 	public override void Init() {
 		MakeCycles();
 	}
+
+
+
+	void OnDrawGizmos() {
+		Teleport[] teleports = transform.root.GetComponentsInChildren<Teleport>();
+		
+		foreach (var tp in teleports) {
+			Gizmos.color = new Color(1 - def.teleportCycleIdx % 2, 1 - def.teleportCycleIdx % 3, 0 + def.teleportCycleIdx % 4);
+			if (tp != this && tp.def.teleportCycleIdx == def.teleportCycleIdx) {
+				Gizmos.DrawLine(transform.position, tp.transform.position);
+			}
+		}
+	}
 }
 
 
 [System.Serializable]
 public class TeleportDefinition : TileObjectDefintion{
-	[Range(0, 100)] public int teleportCycleIdx;
+	[Range(0, 10)] public int teleportCycleIdx;
 }
