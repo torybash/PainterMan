@@ -40,7 +40,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95455db1310c3a546a1d0ad40a437c59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paintBucketTiles: 0
+  paintBucketTiles: 1
   colorDefinitions:
     defList:
     - clr: 1
