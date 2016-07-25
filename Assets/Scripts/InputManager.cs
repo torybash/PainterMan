@@ -7,58 +7,46 @@ public class InputManager : Manager<InputManager> {
 	private const bool DEBUG_TOUCH_INPUT = true;
 
 	private float touchMinMove = 0.5f;
-
-
 	private bool isHoldingMouseButton = false;
 	private Vector2 startTouchPos;
 
 	#endregion Variables
 
-	public Vec2i InputUpdate(bool evenYPos) {
-		Vec2i move = Vec2i.Zero;
+	public HexDirection InputUpdate() {
+		HexDirection dir = HexDirection.None;
 		if (Application.isMobilePlatform || DEBUG_TOUCH_INPUT) {
-			move = TouchInput(evenYPos);
+			dir = TouchInput();
 		}
 #if UNITY_EDITOR
-		Vec2i keyboardInput = KeyboardInput(evenYPos);
-		if (keyboardInput != Vec2i.Zero) move = keyboardInput;
+		HexDirection keyboardDir = KeyboardInput();
+		if (keyboardDir != HexDirection.None) dir= keyboardDir;
 #endif
-		return move;
+		return dir;
 	}
 
 
 
-	private Vec2i KeyboardInput(bool evenYPos) {
-		int xMove = 0, yMove = 0;
+	private HexDirection KeyboardInput() {
 		if (Input.GetKeyDown(KeyCode.U)){
-			xMove = (evenYPos ? -1 : 0);
-			yMove = 1;
-		}else
-		if (Input.GetKeyDown(KeyCode.I)){
-			xMove = (evenYPos ? 0 : 1);
-			yMove = 1;
-		}else
-		if (Input.GetKeyDown(KeyCode.K)){
-			xMove = 1;
-		}else
-		if (Input.GetKeyDown(KeyCode.M)){
-			xMove = (evenYPos ? 0 : 1);
-			yMove = -1;
-		}else
-		if (Input.GetKeyDown(KeyCode.N)){
-			xMove = (evenYPos ? -1 : 0);
-			yMove = -1;
-		}else
-		if (Input.GetKeyDown(KeyCode.H)){
-			xMove = -1;
+			return HexDirection.Up_Left;
+		}else if (Input.GetKeyDown(KeyCode.I)){
+			return HexDirection.Up_Right;
+		}else if (Input.GetKeyDown(KeyCode.K)){
+			return HexDirection.Right;
+		}else if (Input.GetKeyDown(KeyCode.M)){
+			return HexDirection.Down_Right;
+		}else if (Input.GetKeyDown(KeyCode.N)){
+			return HexDirection.Down_Left;
+		}else if (Input.GetKeyDown(KeyCode.H)){
+			return HexDirection.Left;
 		}
-		return new Vec2i(xMove, yMove);
+		return HexDirection.None;
 	}
 
 
 
-	private Vec2i TouchInput(bool evenYPos) {
-		Vec2i move = Vec2i.Zero;
+	private HexDirection TouchInput() {
+		HexDirection dir = HexDirection.None;
 		if (Application.isMobilePlatform) {
 			if (Input.touchCount > 0) {
 				Touch touch = Input.touches[0];
@@ -69,8 +57,7 @@ public class InputManager : Manager<InputManager> {
 				case TouchPhase.Ended:
 					Vector2 diffVec = touch.position - startTouchPos;
 					if (diffVec.magnitude > touchMinMove) {
-						move = InputHelper.GetMoveFromVector(diffVec, evenYPos);
-
+						dir = InputHelper.GetMoveFromVector(diffVec);
 					}
 					break;
 				default:
@@ -88,13 +75,26 @@ public class InputManager : Manager<InputManager> {
 				Vector2 clickPos = Input.mousePosition;
 				Vector2 diffVec = clickPos - startTouchPos;
 				if (diffVec.magnitude > touchMinMove) {
-					move = InputHelper.GetMoveFromVector(diffVec, evenYPos);
+					dir = InputHelper.GetMoveFromVector(diffVec);
 				}
 				isHoldingMouseButton = false;
 			}
 		}
 
 
-		return move;
+		return dir;
 	}
+}
+
+
+
+[System.Serializable]
+public enum HexDirection {
+	None,
+	Right,
+	Left,
+	Up_Right,
+	Up_Left,
+	Down_Right,
+	Down_Left,
 }

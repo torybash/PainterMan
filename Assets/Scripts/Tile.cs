@@ -60,7 +60,7 @@ public class Tile : ProBehaviour {
 			if (tileDef.paintedTurn + 5 <= Game.I.Turn){
 				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
 			}else{
-				float fracDry = 1f - ((tileDef.paintedTurn + GameRules.I.GetTimeToDry(tileDef.color) < Game.I.Turn) ? 0f : 0.5f);
+				float fracDry = 1f - ((tileDef.paintedTurn + GameRules.GetTimeToDry(tileDef.color) < Game.I.Turn) ? 0f : 0.5f);
 				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
 				Sr.color = new Color(Sr.color.r*fracDry, Sr.color.g*fracDry, Sr.color.b*fracDry);
 			}

@@ -4,12 +4,6 @@ using System.Collections.Generic;
 
 public class GameRules : Library<GameRules> {
 
-	[SerializeField] bool paintBucketTiles;
-	public bool PaintBucketTiles {
-		get { return paintBucketTiles; }
-	}
-	[SerializeField] private ColorDefinitions colorDefinitions;
-
 	[System.Serializable]
 	public class ColorDefinitions {
 		public List<ColorDef> defList;
@@ -20,9 +14,25 @@ public class GameRules : Library<GameRules> {
 		}
 	}
 
+	[SerializeField] bool paintBucketTiles;
+	public static bool PaintBucketTiles {
+		get { return I.paintBucketTiles; }
+	}
+	[SerializeField] bool normalTilesCausesSlide;
+	public static bool NormalTilesCausesSlide {
+		get { return I.normalTilesCausesSlide; }
+	}
+	[SerializeField] bool paintBehindPlayer;
+	public static bool PaintBehindPlayer {
+		get { return I.paintBehindPlayer; }
+	}
 
-	public int GetTimeToDry(TileColor clr) {
-		foreach (var item in colorDefinitions.defList) {
+	[SerializeField] private ColorDefinitions colorDefinitions;
+
+
+
+	public static int GetTimeToDry(TileColor clr) {
+		foreach (var item in I.colorDefinitions.defList) {
 			if (item.clr == clr) return item.timeToDry; 
 		}
 		Debug.LogError("GetTimeToDry - could not find val for color: " + clr);

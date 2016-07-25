@@ -22,6 +22,45 @@ public class GameHelper {
 		//float yPos = 1.5f * pos.y;
 		return new Vec2i(xPos, yPos);
 	}
+
+	public static Vec2i PositionFromDirection(Vec2i pos, HexDirection dir) {
+		bool evenYPos = pos.y % 2 == 0;
+		Vec2i endPos = pos;
+		switch (dir) {
+		case HexDirection.Right:
+			endPos.x += 1;
+			break;
+		case HexDirection.Left:
+			endPos.x -= 1;
+			break;
+		case HexDirection.Up_Right:
+			endPos.x += (evenYPos ? 0 : 1);
+			endPos.y += 1;
+			break;
+		case HexDirection.Up_Left:
+			endPos.x += (evenYPos ? -1 : 0);
+			endPos.y += 1;
+			break;
+		case HexDirection.Down_Right:
+			endPos.x += (evenYPos ? 0 : 1);
+			endPos.y -= 1;
+			break;
+		case HexDirection.Down_Left:
+			endPos.x += (evenYPos ? -1 : 0);
+			endPos.y -= 1;
+			break;
+		}
+		return endPos;
+	}
+
+		//	if (Input.GetKeyDown(KeyCode.M)){
+		//	xMove = (evenYPos ? 0 : 1);
+		//	yMove = -1;
+		//}else
+		//if (Input.GetKeyDown(KeyCode.N)){
+		//	xMove = (evenYPos ? -1 : 0);
+		//	yMove = -1;
+		//}else
 }
 
 [System.Serializable]

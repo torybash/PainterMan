@@ -12,27 +12,22 @@ public class InputHelper {
 		return -1;
 	}
 
-	public static Vec2i GetMoveFromVector(Vector2 vec, bool evenYPos) {
-		Vec2i move = Vec2i.Zero;
+	public static HexDirection GetMoveFromVector(Vector2 vec) {
 		float angle = Mathf.Atan2(vec.y, vec.x) * Mathf.Rad2Deg;
 		if (angle > 150 || angle < -150) {
-			move.x = -1;
+			return HexDirection.Left;
 		}else if (angle < 150 && angle > 90) {
-			move.x = (evenYPos ? -1 : 0);
-			move.y = 1;
+			return HexDirection.Up_Left;
 		} else if (angle < 90 && angle > 30) {
-			move.x = (evenYPos ? 0 : 1);
-			move.y = 1;
+			return HexDirection.Up_Right;
 		}else if (angle < 30 && angle > -30) {
-			move.x = 1;
+			return HexDirection.Right;
 		}else if (angle < -30 && angle > -90) {
-			move.x = (evenYPos ? 0 : 1);
-			move.y = -1;
+			return HexDirection.Down_Right;
 		}else if (angle < -90 && angle > -150) {
-			move.x = (evenYPos ? -1 : 0);
-			move.y = -1;
+			return HexDirection.Down_Left;
 		}
-		//Debug.Log("GetMoveFromVector - vec: " + vec + ", angel: " + angle + " , move: " + move);
-		return move;
+		Debug.LogError("GetMoveFromVector - ERROR! Returning null!");
+		return HexDirection.None;
 	}
 }

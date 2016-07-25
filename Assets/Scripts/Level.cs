@@ -93,7 +93,7 @@ public class Level : ProBehaviour {
 
 	public bool IsWalkable(Vec2i pos, int turn){
 		Debug.Log("[Level] IsWalkable - pos: "+ pos + ", turn: "+ turn + ", tile: "+ tileMap.GetTile(pos) + ", is color dry?: "+ IsColorDry(pos, turn));
-		return tileMap.GetTile(pos).TileDef.color == TileColor.None || IsColorDry(pos, turn);
+		return tileMap.IsValidTile(pos) && (tileMap.GetTile(pos).TileDef.color == TileColor.None || IsColorDry(pos, turn));
 	}
 	public bool IsColorDry(Vec2i pos, int turn){
 		if (IsValidTile(pos)){
@@ -101,14 +101,14 @@ public class Level : ProBehaviour {
 			if (def.type == TileType.Bucket) {
 				return true;
 			}
-			if (def.color != TileColor.None && def.paintedTurn + GameRules.I.GetTimeToDry(def.color) < turn){
+			if (def.color != TileColor.None && def.paintedTurn + GameRules.GetTimeToDry(def.color) < turn){
 //				Debug.Log("[Level] Color IS dry!");
 				return true;
 			}
 //			Debug.Log("[Level] Color IS NOT dry..");
 			return false;
 		}
-		Debug.LogError("IsColorDry invalid pos!");
+		//Debug.LogError("IsColorDry invalid pos!");
 		return false;
 	}
 	public bool CheckForWin() {

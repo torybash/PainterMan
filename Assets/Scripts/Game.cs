@@ -30,9 +30,9 @@ public class Game : Controller<Game> {
 
 	void Update(){
 		if (state != State.Normal) return;
-		Vec2i move = InputManager.I.InputUpdate(playerPos.y % 2 == 0);
+		HexDirection dir = InputManager.I.InputUpdate();
 
-		if (move != Vec2i.Zero) TryMovePlayer(move);
+		if (dir != HexDirection.None) TryMovePlayer(dir);
 	}
 
 	private void StartLevel() {
@@ -63,45 +63,65 @@ public class Game : Controller<Game> {
 	#endregion Level Managing
 
 
-	private void TryMovePlayer(Vec2i move) { 
-
-		Vec2i endPos = playerPos + move;
-		Log("TryMovePlayer - move: " + move + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
-		if (currLvl.IsValidTile(endPos) && currLvl.IsWalkable(endPos, turn)){
-			ExecuteTurn(move, endPos);
+	private void TryMovePlayer(HexDirection dir) {
+		Vec2i endPos = GameHelper.PositionFromDirection(playerPos, dir);
+		Log("TryMovePlayer - dir: " + dir + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
+		//if (GameRules.)
+		if (currLvl.IsWalkable(endPos, turn)){
+			//while (currLvl.IsWalkable(endPos + move, turn)) endPos += move;
+			ExecuteMove(playerPos, dir);
 		}
 	}
 
-	private void ExecuteTurn(Vec2i move, Vec2i endPos) {
-		Log("Move - move: "+ move + ", endPos: "+ endPos + ", endPos tile: "+ currLvl.GetTileType(endPos)); 
+	private void ExecuteMove(Vec2i startPos, HexDirection dir) {
+		Vec2i endPos = GameHelper.PositionFromDirection(startPos, dir);
+		Log("Move - endPos: " + endPos + ", endPos tile: " + currLvl.GetTileType(endPos));
 
 		//Set Player position, interact with end tile
-		playerPos = endPos;
-		playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(endPos) + currLvl.transform.position;
+		//playerPos = endPos;
+		//playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(endPos) + currLvl.transform.position;
 
 		// interact with end tile
-		if (PlayerTileInteraction()) return;
-
-		//Update TileObjects
-		currLvl.UpdateTileObjects();
-
+		if (GameRules.PaintBehindPlayer) {
+			if (PlayerTileInteraction(startPos)) return;
+		} else {
+			if (PlayerTileInteraction(endPos)) return;
+		}
+	
 		//Check for interaction between player and tileObjects
 		if (PlayerTOInteraction()) return;
 
-		//Go to next turn
-		turn++;
-		GameUI.I.SetTurnsText(turn);
+		//Slide
+		if (GameRules.NormalTilesCausesSlide) {
+			Vec2i newEndPos = GameHelper.PositionFromDirection(endPos, dir);
+			if (currLvl.IsWalkable(newEndPos, turn)) {
+				ExecuteMove(endPos, dir);
+				return;
+			}
+		}
+
+		StartCoroutine(_MovePlayer(endPos, () => {
+			//Go to next turn
+			currLvl.UpdateTileObjects(); //Update TileObjects
+			turn++;
+			GameUI.I.SetTurnsText(turn);
+		}));
+
 	}
 
-	private bool PlayerTileInteraction() {
-		TileType tileTyp = currLvl.GetTileType(playerPos);
+
+
+
+
+	private bool PlayerTileInteraction(Vec2i pos) {
+		TileType tileTyp = currLvl.GetTileType(pos);
 		if (tileTyp == TileType.Bucket){
-			currPlayerColor = currLvl.GetTileColorType(playerPos);
+			currPlayerColor = currLvl.GetTileColorType(pos);
 			playerObj.GetComponent<SpriteRenderer>().color = SpriteLibrary.GetTileColor(currPlayerColor);
 		}
 
 		if (currPlayerColor != TileColor.None){  //Paint tile, if not already painted OR if dry - with player color
-			if (tileTyp != TileType.Bucket || GameRules.I.PaintBucketTiles) currLvl.PaintTile(playerPos, currPlayerColor, turn);
+			if (tileTyp != TileType.Bucket || GameRules.PaintBucketTiles) currLvl.PaintTile(pos, currPlayerColor, turn);
 		}
 
 		if (tileTyp == TileType.Goal && currLvl.CheckForWin()){
@@ -121,11 +141,11 @@ public class Game : Controller<Game> {
 
 			case TileObjectInteractionResultType.Teleport:
 				//Set Player position, interact with end tile
-				playerPos = result.position;
-				playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(result.position) + currLvl.transform.position;
+				//playerPos = result.position;
+				//playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(result.position) + currLvl.transform.position;
 
 				// interact with end tile
-				if (PlayerTileInteraction()) return true;
+				//if (PlayerTileInteraction()) return true;
 				break;
 
 			default: break;
@@ -173,4 +193,24 @@ public class Game : Controller<Game> {
 		currLvl.UnloadMap();
 		LoadLevel(currLevelIdx);
 	}
+
+
+	#region Coroutines
+	private IEnumerator _MovePlayer(Vec2i endPos, System.Action callback) {
+		float duration = 0.5f;
+		float endTime = Time.time + duration;
+		Vector2 startWPos = GameHelper.TileToWorldPos(playerPos) + (Vector2)currLvl.transform.position;
+		Vector2 endWPos = GameHelper.TileToWorldPos(endPos) + (Vector2)currLvl.transform.position;
+		while (Time.time < endTime) {
+			float t = 1 - (endTime - Time.time) / duration; 
+			playerObj.transform.position = startWPos +  (endWPos - startWPos) * t;
+			yield return null;
+		}
+		playerPos = endPos;
+		playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(endPos) + currLvl.transform.position;
+
+		callback();
+	}
+
+	#endregion Coroutines
 }
