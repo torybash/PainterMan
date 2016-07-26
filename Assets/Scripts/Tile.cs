@@ -58,7 +58,12 @@ public class Tile : ProBehaviour {
 	private void RefreshPaintColor() {
 		if (tileDef.color != TileColor.None && tileDef.paintedTurn >= 0) { //&& tileDef.type != TileType.Bucket){
 			if (tileDef.paintedTurn + 5 <= Game.I.Turn){
-				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
+				if (GameRules.PaintDisappearInsteadOfDrying && tileDef.type != TileType.Bucket) {
+					tileDef.color = TileColor.None;
+					Refresh();
+				} else {
+					Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
+				}
 			}else{
 				float fracDry = 1f - ((tileDef.paintedTurn + GameRules.GetTimeToDry(tileDef.color) < Game.I.Turn) ? 0f : 0.5f);
 				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);

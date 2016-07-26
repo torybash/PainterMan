@@ -40,8 +40,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95455db1310c3a546a1d0ad40a437c59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paintBucketTiles: 0
+  removeBucketsOnEnter: 1
+  turnsCountWhenSliding: 1
+  paintDisappearInsteadOfDrying: 1
+  paintBucketTiles: 1
   normalTilesCausesSlide: 1
+  paintBehindPlayer: 1
   colorDefinitions:
     defList:
     - clr: 1
@@ -56,6 +60,7 @@ MonoBehaviour:
       timeToDry: 2
     - clr: 6
       timeToDry: 3
+  animDurationPrTile: 0.2
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

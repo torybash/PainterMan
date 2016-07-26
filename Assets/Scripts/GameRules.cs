@@ -14,21 +14,30 @@ public class GameRules : Library<GameRules> {
 		}
 	}
 
-	[SerializeField] bool paintBucketTiles;
-	public static bool PaintBucketTiles {
-		get { return I.paintBucketTiles; }
-	}
-	[SerializeField] bool normalTilesCausesSlide;
-	public static bool NormalTilesCausesSlide {
-		get { return I.normalTilesCausesSlide; }
-	}
-	[SerializeField] bool paintBehindPlayer;
-	public static bool PaintBehindPlayer {
-		get { return I.paintBehindPlayer; }
-	}
 
+
+	[Header("Game logic")]
+	[SerializeField] bool removeBucketsOnEnter;
+	public static bool RemoveBucketsOnEnter { get { return I.removeBucketsOnEnter; } }
+	[SerializeField] bool turnsCountWhenSliding;
+	public static bool TurnsCountWhenSliding { get { return I.turnsCountWhenSliding; } }
+	[SerializeField] bool paintDisappearInsteadOfDrying;
+	public static bool PaintDisappearInsteadOfDrying { get { return I.paintDisappearInsteadOfDrying; } }
+	[SerializeField] bool paintBucketTiles;
+	public static bool PaintBucketTiles { get { return I.paintBucketTiles; } }
+	[SerializeField] bool normalTilesCausesSlide;
+	public static bool NormalTilesCausesSlide { get { return I.normalTilesCausesSlide; } }
+	[SerializeField] bool paintBehindPlayer;
+	public static bool PaintBehindPlayer { get { return I.paintBehindPlayer; } }
+
+
+	[Header("Defintion of colors")]
 	[SerializeField] private ColorDefinitions colorDefinitions;
 
+
+	[Header("Animation settings")]
+	[SerializeField] float animDurationPrTile = 0.2f;
+	public static float AnimDurationPrTile { get { return I.animDurationPrTile; }}
 
 
 	public static int GetTimeToDry(TileColor clr) {
