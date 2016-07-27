@@ -41,7 +41,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   removeBucketsOnEnter: 1
-  turnsCountWhenSliding: 1
+  turnsCountWhenSliding: 0
   paintDisappearInsteadOfDrying: 1
   paintBucketTiles: 1
   normalTilesCausesSlide: 1
@@ -49,9 +49,9 @@ MonoBehaviour:
   colorDefinitions:
     defList:
     - clr: 1
-      timeToDry: 4
+      timeToDry: 3
     - clr: 2
-      timeToDry: 4
+      timeToDry: 3
     - clr: 3
       timeToDry: 4
     - clr: 4
