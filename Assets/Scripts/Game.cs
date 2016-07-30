@@ -66,11 +66,20 @@ public class Game : Controller<Game> {
 	private void TryMovePlayer(HexDirection dir) {
 		Vec2i endPos = GameHelper.PositionFromDirection(playerPos, dir);
 		Log("TryMovePlayer - dir: " + dir + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
-		//if (GameRules.)
-		if (currLvl.IsWalkable(endPos, turn)){
-			//while (currLvl.IsWalkable(endPos + move, turn)) endPos += move;
+
+		if (IsWalkable(endPos)){
 			ExecuteMove(playerPos, dir);
 		}
+	}
+
+	private bool IsWalkable(Vec2i pos) {
+		if (currLvl.IsWalkable(pos, turn)) {
+			if (GameRules.CantMoveOverOtherColors && currLvl.GetTileType(pos) != TileType.Bucket && currLvl.GetTileColorType(pos) != TileColor.None && currPlayerColor != currLvl.GetTileColorType(pos)) {
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 	private void ExecuteMove(Vec2i startPos, HexDirection dir) {
@@ -100,9 +109,9 @@ public class Game : Controller<Game> {
 			//Slide
 			if (GameRules.NormalTilesCausesSlide) {
 				Vec2i newEndPos = GameHelper.PositionFromDirection(playerPos, dir);
-				if (currLvl.IsWalkable(newEndPos, turn)) {
+				if (IsWalkable(newEndPos)) {
 					if (GameRules.TurnsCountWhenSliding) turn++;
-					ExecuteMove(endPos, dir);
+					ExecuteMove(playerPos, dir);
 					return;
 				}
 			}

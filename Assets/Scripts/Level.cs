@@ -93,7 +93,8 @@ public class Level : ProBehaviour {
 
 	public bool IsWalkable(Vec2i pos, int turn){
 		Debug.Log("[Level] IsWalkable - pos: "+ pos + ", turn: "+ turn + ", tile: "+ tileMap.GetTile(pos) + ", is color dry?: "+ IsColorDry(pos, turn));
-		return tileMap.IsValidTile(pos) && (tileMap.GetTile(pos).TileDef.color == TileColor.None || IsColorDry(pos, turn));
+
+		return tileMap.IsValidTile(pos) && (tileMap.GetTile(pos).TileDef.color == TileColor.None || (!GameRules.PaintNeedsToBeDry || IsColorDry(pos, turn)) );
 	}
 	public bool IsColorDry(Vec2i pos, int turn){
 		if (IsValidTile(pos)){

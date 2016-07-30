@@ -66,6 +66,12 @@ public class Tile : ProBehaviour {
 				}
 			}else{
 				float fracDry = 1f - ((tileDef.paintedTurn + GameRules.GetTimeToDry(tileDef.color) < Game.I.Turn) ? 0f : 0.5f);
+
+				if (GameRules.PaintGradient) {
+					fracDry = 1f - (Game.I.Turn - 1 - tileDef.paintedTurn) / (float) GameRules.GetTimeToDry(tileDef.color);
+				}
+				Debug.Log("fracDry: "+ fracDry + ", tileDef.paintedTurn: " + tileDef.paintedTurn + ", Game.I.Turn: " + Game.I.Turn + ", GameRules.GetTimeToDry(tileDef.color): " + GameRules.GetTimeToDry(tileDef.color));
+
 				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
 				Sr.color = new Color(Sr.color.r*fracDry, Sr.color.g*fracDry, Sr.color.b*fracDry);
 			}
