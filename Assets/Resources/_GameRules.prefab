@@ -51,9 +51,9 @@ MonoBehaviour:
   colorDefinitions:
     defList:
     - clr: 1
-      timeToDry: 4
+      timeToDry: 3
     - clr: 2
-      timeToDry: 4
+      timeToDry: 3
     - clr: 3
       timeToDry: 4
     - clr: 4
