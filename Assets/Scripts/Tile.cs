@@ -14,13 +14,14 @@ public class Tile : ProBehaviour {
 	}
 
 	private SpriteRenderer sr;
-	private SpriteRenderer Sr{
-		get{ 
+	private SpriteRenderer TileSR {
+		get {
 			if (sr == null) sr = GetComponent<SpriteRenderer>();
 			return sr;
 		}
 	}
 
+	//[SerializeField] SpriteRenderer paintSR;
 	[SerializeField] SpriteRenderer indicatorSR;
 
 
@@ -39,11 +40,13 @@ public class Tile : ProBehaviour {
 
 		if (tileDef.type == TileType.Empty){
 			//Sr.enabled = false;	
+			//paintSR.enabled = false;
 			Debug.LogError("Empty tileType?!");
 		}else {
-			Sr.enabled = true;	
-			Sr.sprite = SpriteLibrary.GetTileSprite(tileDef.type);
-			Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
+			//paintSR.enabled = true;
+			//paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+			TileSR.sprite = SpriteLibrary.GetTileSprite(tileDef.type);
+			TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
 			indicatorSR.color = SpriteLibrary.GetTileColor(tileDef.goalColor);
 		}
 
@@ -57,12 +60,13 @@ public class Tile : ProBehaviour {
 
 	private void RefreshPaintColor() {
 		if (tileDef.color != TileColor.None && tileDef.paintedTurn >= 0) { //&& tileDef.type != TileType.Bucket){
-			if (tileDef.paintedTurn + 5 <= Game.I.Turn){
+			if (tileDef.paintedTurn + GameRules.GetTimeToDry(tileDef.color) <= Game.I.Turn){
 				if (GameRules.PaintDisappearInsteadOfDrying && tileDef.type != TileType.Bucket) {
 					tileDef.color = TileColor.None;
 					Refresh();
 				} else {
-					Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
+					TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+					//paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
 				}
 			}else{
 				float fracDry = 1f - ((tileDef.paintedTurn + GameRules.GetTimeToDry(tileDef.color) < Game.I.Turn) ? 0f : 0.5f);
@@ -72,8 +76,10 @@ public class Tile : ProBehaviour {
 				}
 				Debug.Log("fracDry: "+ fracDry + ", tileDef.paintedTurn: " + tileDef.paintedTurn + ", Game.I.Turn: " + Game.I.Turn + ", GameRules.GetTimeToDry(tileDef.color): " + GameRules.GetTimeToDry(tileDef.color));
 
-				Sr.color = SpriteLibrary.GetTileColor(tileDef.color);
-				Sr.color = new Color(Sr.color.r*fracDry, Sr.color.g*fracDry, Sr.color.b*fracDry);
+				TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+				TileSR.color = new Color(TileSR.color.r * fracDry, TileSR.color.g * fracDry, TileSR.color.b * fracDry);
+				//paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+				//paintSR.color = new Color(paintSR.color.r*fracDry, paintSR.color.g*fracDry, paintSR.color.b*fracDry);
 			}
 		}
 	}
