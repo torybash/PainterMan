@@ -21,7 +21,7 @@ public class Tile : ProBehaviour {
 		}
 	}
 
-	//[SerializeField] SpriteRenderer paintSR;
+	[SerializeField] SpriteRenderer paintSR;
 	[SerializeField] SpriteRenderer indicatorSR;
 
 
@@ -39,14 +39,14 @@ public class Tile : ProBehaviour {
 		if (tileDef == null) return;
 
 		if (tileDef.type == TileType.Empty){
-			//Sr.enabled = false;	
 			//paintSR.enabled = false;
 			Debug.LogError("Empty tileType?!");
 		}else {
-			//paintSR.enabled = true;
-			//paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+			if (paintSR != null) paintSR.enabled = tileDef.color != TileColor.None;
+			
+			if (paintSR != null) paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
 			TileSR.sprite = SpriteLibrary.GetTileSprite(tileDef.type);
-			TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+			//TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
 			indicatorSR.color = SpriteLibrary.GetTileColor(tileDef.goalColor);
 		}
 
@@ -65,8 +65,8 @@ public class Tile : ProBehaviour {
 					tileDef.color = TileColor.None;
 					Refresh();
 				} else {
-					TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
-					//paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+					//TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+					if (paintSR != null) paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
 				}
 			}else{
 				float fracDry = 1f - ((tileDef.paintedTurn + GameRules.GetTimeToDry(tileDef.color) < Game.I.Turn) ? 0f : 0.5f);
@@ -76,10 +76,10 @@ public class Tile : ProBehaviour {
 				}
 				Debug.Log("fracDry: "+ fracDry + ", tileDef.paintedTurn: " + tileDef.paintedTurn + ", Game.I.Turn: " + Game.I.Turn + ", GameRules.GetTimeToDry(tileDef.color): " + GameRules.GetTimeToDry(tileDef.color));
 
-				TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
-				TileSR.color = new Color(TileSR.color.r * fracDry, TileSR.color.g * fracDry, TileSR.color.b * fracDry);
-				//paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
-				//paintSR.color = new Color(paintSR.color.r*fracDry, paintSR.color.g*fracDry, paintSR.color.b*fracDry);
+				//TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+				//TileSR.color = new Color(TileSR.color.r * fracDry, TileSR.color.g * fracDry, TileSR.color.b * fracDry);
+				if (paintSR != null) paintSR.color = SpriteLibrary.GetTileColor(tileDef.color);
+				if (paintSR != null) paintSR.color = new Color(paintSR.color.r * fracDry, paintSR.color.g * fracDry, paintSR.color.b * fracDry);
 			}
 		}
 	}

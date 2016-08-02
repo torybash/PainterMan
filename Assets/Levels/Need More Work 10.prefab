@@ -1175,6 +1175,7 @@ MonoBehaviour:
       x: 4
       y: 2
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21213042}
 --- !u!114 &11412536
 MonoBehaviour:
@@ -1195,6 +1196,7 @@ MonoBehaviour:
       x: 4
       y: 3
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21250568}
 --- !u!114 &11414026
 MonoBehaviour:
@@ -1215,6 +1217,7 @@ MonoBehaviour:
       x: 1
       y: 2
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21260536}
 --- !u!114 &11418794
 MonoBehaviour:
@@ -1235,6 +1238,7 @@ MonoBehaviour:
       x: 3
       y: 2
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21274642}
 --- !u!114 &11419482
 MonoBehaviour:
@@ -1255,6 +1259,7 @@ MonoBehaviour:
       x: 3
       y: 1
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21233236}
 --- !u!114 &11420162
 MonoBehaviour:
@@ -1323,6 +1328,7 @@ MonoBehaviour:
       x: 1
       y: 4
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21232048}
 --- !u!114 &11449044
 MonoBehaviour:
@@ -1343,6 +1349,7 @@ MonoBehaviour:
       x: 3
       y: 4
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21267460}
 --- !u!114 &11472898
 MonoBehaviour:
@@ -1363,6 +1370,7 @@ MonoBehaviour:
       x: 0
       y: 2
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21226166}
 --- !u!114 &11475710
 MonoBehaviour:
@@ -1383,6 +1391,7 @@ MonoBehaviour:
       x: 3
       y: 3
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21212526}
 --- !u!114 &11476044
 MonoBehaviour:
@@ -1403,6 +1412,7 @@ MonoBehaviour:
       x: 0
       y: 3
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21296090}
 --- !u!114 &11477210
 MonoBehaviour:
@@ -1423,6 +1433,7 @@ MonoBehaviour:
       x: 2
       y: 5
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21240018}
 --- !u!114 &11477246
 MonoBehaviour:
@@ -1443,6 +1454,7 @@ MonoBehaviour:
       x: 3
       y: 5
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21295204}
 --- !u!114 &11477686
 MonoBehaviour:
@@ -1463,6 +1475,7 @@ MonoBehaviour:
       x: 0
       y: 4
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21288940}
 --- !u!114 &11481500
 MonoBehaviour:
@@ -1483,6 +1496,7 @@ MonoBehaviour:
       x: 4
       y: 4
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21204932}
 --- !u!114 &11483314
 MonoBehaviour:
@@ -1503,6 +1517,7 @@ MonoBehaviour:
       x: 1
       y: 5
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21223448}
 --- !u!114 &11490592
 MonoBehaviour:
@@ -1523,6 +1538,7 @@ MonoBehaviour:
       x: 0
       y: 5
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21247830}
 --- !u!114 &11492198
 MonoBehaviour:
@@ -1543,6 +1559,7 @@ MonoBehaviour:
       x: 0
       y: 1
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21226980}
 --- !u!114 &11494088
 MonoBehaviour:
@@ -1563,6 +1580,7 @@ MonoBehaviour:
       x: 2
       y: 2
     paintedTurn: -1
+  paintSR: {fileID: 0}
   indicatorSR: {fileID: 21211500}
 --- !u!212 &21204932
 SpriteRenderer:
