@@ -35,12 +35,16 @@ public class Game : Controller<Game> {
 		if (dir != HexDirection.None) TryMovePlayer(dir);
 	}
 
+	private void ColorPlayer(TileColor color) {
+		currPlayerColor = color;
+		playerObj.GetComponent<SpriteRenderer>().color = SpriteLibrary.GetTileColor(currPlayerColor);
+	}
+
 	private void StartLevel() {
 		Vec2i startPos = currLvl.GetStartPos();
 		playerPos = startPos;
-		currPlayerColor = TileColor.None;
+		ColorPlayer(TileColor.None);
 		playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(startPos) + currLvl.transform.position;
-		playerObj.GetComponent<SpriteRenderer>().color = SpriteLibrary.GetTileColor(currPlayerColor);
 
 		currLvl.InitTileObjects();
 
@@ -98,22 +102,27 @@ public class Game : Controller<Game> {
 
 			// interact with end tile
 			if (GameRules.PaintBehindPlayer) {
-				if (PlayerTileInteraction(startPos)) return;
+				PlayerTileInteraction(startPos);
 			} else {
-				if (PlayerTileInteraction(endPos)) return;
+				PlayerTileInteraction(endPos);
 			}
-	
-			//Check for interaction between player and tileObjects
-			if (PlayerTOInteraction(endPos)) return;
 
-			//Slide
+			//Check for sliding
+			bool sliding = false;
 			if (GameRules.NormalTilesCausesSlide) {
 				Vec2i newEndPos = GameHelper.PositionFromDirection(playerPos, dir);
 				if (IsWalkable(newEndPos)) {
-					if (GameRules.TurnsCountWhenSliding) turn++;
-					ExecuteMove(playerPos, dir);
-					return;
+					sliding = true;
 				}
+			}
+
+			//Check for interaction between player and tileObjects
+			if (PlayerTOInteraction(endPos, sliding)) return;
+
+			//Slide!
+			if (sliding) {
+				if (GameRules.TurnsCountWhenSliding) turn++;
+				ExecuteMove(playerPos, dir);
 			}
 
 			//Go to next turn
@@ -128,33 +137,34 @@ public class Game : Controller<Game> {
 
 
 
-	private bool PlayerTileInteraction(Vec2i pos) {
+	private void PlayerTileInteraction(Vec2i pos) {
 		TileType tileTyp = currLvl.GetTileType(pos);
-		if (tileTyp == TileType.Bucket){
-			currPlayerColor = currLvl.GetTileColorType(pos);
-			playerObj.GetComponent<SpriteRenderer>().color = SpriteLibrary.GetTileColor(currPlayerColor);
-			if (GameRules.RemoveBucketsOnEnter) {
-				TileDefinition newTileDef = currLvl.Map.GetTile(pos).TileDef;
-				newTileDef.type = TileType.Normal;
-				currLvl.Map.SetTile(pos, newTileDef);
-				currLvl.Map.GetTile(pos).Refresh();
-			}
-		}
+		//if (tileTyp == TileType.Bucket) {
+		//	ColorPlayer(currLvl.GetTileColorType(pos));
+		//	if (GameRules.RemoveBucketsOnEnter) {
+		//		TileDefinition newTileDef = currLvl.Map.GetTile(pos).TileDef;
+		//		newTileDef.type = TileType.Normal;
+		//		currLvl.Map.SetTile(pos, newTileDef);
+		//		currLvl.Map.GetTile(pos).Refresh();
+		//	}
+		//}
 
-		if (currPlayerColor != TileColor.None){  //Paint tile, if not already painted OR if dry - with player color
+		if (currPlayerColor != TileColor.None) {  //Paint tile, if not already painted OR if dry - with player color
 			if (tileTyp != TileType.Bucket || GameRules.PaintBucketTiles) currLvl.PaintTile(pos, currPlayerColor, turn);
 		}
 
-		if (tileTyp == TileType.Goal && currLvl.CheckForWin()){
-			WinLevel();
-			return true;
-		}
-		return false;
+		//if (tileTyp == TileType.Goal && currLvl.CheckForWin()) {
+		//	WinLevel();
+		//	return true;
+		//}
+		//return false;
 	}
 
-	private bool PlayerTOInteraction(Vec2i pos) {
-		foreach (var to in currLvl.Map.GetTileObjectsAtPos(pos)) {
+	private bool PlayerTOInteraction(Vec2i pos, bool sliding) {
+		foreach (var to in currLvl.Map.GetTOAtPos(pos)) {
 			var result = to.PlayerEntered();
+			Debug.Log("PlayerTOInteraction - sliding: " + sliding + ", result.type: "+ result.type);
+
 			switch (result.type) {
 			case TileObjectInteractionResultType.Kill:
 				LoseLevel();
@@ -169,7 +179,16 @@ public class Game : Controller<Game> {
 				// interact with end tile
 				//if (PlayerTileInteraction()) return true;
 				break;
-
+			case TileObjectInteractionResultType.PickupColor:
+				ColorPlayer(result.color);
+				currLvl.Map.DeleteTOAtPos(pos, to);
+				break;
+			case TileObjectInteractionResultType.Exit:
+				if (!sliding) {
+					WinLevel();
+					return true;
+				}
+				break;
 			default: break;
 			}
 			 //if (result.kill)

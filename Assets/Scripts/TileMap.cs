@@ -134,7 +134,7 @@ public class TileMap {
 	public void AddTileObject(TileObject to) {
 		toList.Add(to);
 	}
-	public List<TileObject> GetTileObjectsAtPos(Vec2i pos) {
+	public List<TileObject> GetTOAtPos(Vec2i pos) {
 		List<TileObject> toAtPosList = new List<TileObject>();
 		foreach (var to in toList) {
 			if (to.ToDef.pos == pos) toAtPosList.Add(to);
@@ -149,6 +149,11 @@ public class TileMap {
 		return false;
 	}
 
+	public T GetTOOfType<T>() where T : TileObject {
+		foreach (TileObject to in toList) if (to.GetType() == typeof(T)) return (T) to;
+		return null;
+	}
+
 	public List<T> GetAllTOOfType<T>() where T : TileObject {
 		List<T> list = new List<T>();
 		foreach (TileObject to in toList) {
@@ -157,8 +162,20 @@ public class TileMap {
 		return list;
 	}
 
+	public void DeleteTOAtPos(Vec2i pos, TileObject to) {
+		foreach (var other in GetTOAtPos(pos)) {
+			if (to == other) toList.Remove(to);
+#if UNITY_EDITOR
+			Undo.DestroyObjectImmediate(to.gameObject);
+#else
+			Destroy(other);
+#endif
+			return;
+		}
+	}
+
 	public void DeleteAllTOAtPos(Vec2i pos) {
-		foreach (var to in GetTileObjectsAtPos(pos)) {
+		foreach (var to in GetTOAtPos(pos)) {
 			toList.Remove(to);
 #if UNITY_EDITOR
 			Undo.DestroyObjectImmediate(to.gameObject);
@@ -166,5 +183,7 @@ public class TileMap {
 		}
 	}
 
-	#endregion TileObjects
+
+
+#endregion TileObjects
 }

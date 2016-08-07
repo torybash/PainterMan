@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public abstract class TileObject : MonoBehaviour{
 
+
 	public abstract TileObjectDefintion ToDef { get; set; }
 
 	public virtual void Set(TileObjectDefintion def) {
@@ -10,50 +11,47 @@ public abstract class TileObject : MonoBehaviour{
 		ToDef.className = def.className;
 	}
 
-	public virtual void UpdateTO() {
 
-	}
 
 	public virtual TileObjectInteractionResult PlayerEntered() {
 		return TileObjectInteractionResult.Empty();
 	}
 
-	public virtual void Init() {
-
-	}
-
+	public virtual void Init() {}
+	public virtual void UpdateTO() {}
 }
 
 [System.Serializable]
 public class TileObjectDefintion {
-	[ReadOnly] public Vec2i pos;
-	[ReadOnly] public string className;
+	[ReadOnly]
+	public Vec2i pos;
+	[ReadOnly]
+	public string className;
 }
 
 
 
-[System.Serializable]
 public class TileObjectInteractionResult {
 
 	public TileObjectInteractionResultType type;
-	public Vec2i position;
+	public Vec2i pos;
+	public TileColor color;
+
+	public TileObjectInteractionResult(TileObjectInteractionResultType type, Vec2i pos = default(Vec2i), TileColor color = TileColor.None) {
+		this.type = type;
+		this.pos = pos;
+		this.color = color;
+	}
 
 	public static TileObjectInteractionResult Empty() {
-		return new TileObjectInteractionResult();
-	}
-
-	public static TileObjectInteractionResult TeleportResult(Vec2i endPos) {
-		return new TileObjectInteractionResult { type = TileObjectInteractionResultType.Teleport, position = endPos };
-	}
-
-	public static TileObjectInteractionResult KillResult() {
-		return new TileObjectInteractionResult { type = TileObjectInteractionResultType.Kill};
+		return new TileObjectInteractionResult(TileObjectInteractionResultType.None);
 	}
 }
 
-[System.Serializable]
 public enum TileObjectInteractionResultType {
 	None,
 	Kill,
-	Teleport
+	Exit,
+	Teleport,
+	PickupColor
 }

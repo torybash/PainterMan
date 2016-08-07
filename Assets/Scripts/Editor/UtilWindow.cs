@@ -61,19 +61,7 @@ public class UtilWindow : EditorWindow {
 		if (replaceGO == null) return;
 		Debug.Log("ReplaceByList");
 		foreach (GameObject origGO in toReplaceList) {
-			GameObject newGO = Instantiate(replaceGO);
-//			GameObject newGO = (GameObject) PrefabUtility.InstantiatePrefab((Object)replaceGO);
-
-			Debug.Log("newGO: "+ newGO + ", origGO: "+ origGO);
-
-			newGO.transform.SetParent(origGO.transform.parent);
-			newGO.transform.localPosition = origGO.transform.localPosition;
-			newGO.transform.localScale = origGO.transform.localScale;
-			newGO.transform.localRotation = origGO.transform.localRotation;
-
-			newGO.name = origGO.name;
-
-			DestroyImmediate(origGO);
+			ReplaceSceneObject(origGO);
 		}
 		toReplaceList.Clear();
 	}
@@ -101,27 +89,39 @@ public class UtilWindow : EditorWindow {
 		}
 
 		//Find probject gameobjects
-		if (searchInProject) {
-			objs = Resources.FindObjectsOfTypeAll(classTyp);
-			foreach (var item in objs) {
-				Debug.Log("project item: "+ item);
-				GameObject itemGO = null;
-				MonoBehaviour itemMB = item as MonoBehaviour;
-				if (itemMB != null) itemGO = itemMB.gameObject;
-				if (itemGO != null && !foundList.Contains(itemGO)) {
-					foundList.Add(itemGO);
-					Debug.Log("project itemGO: " + itemGO + ", root: "+ itemGO.transform.root.gameObject);
-				}
-			}
-		}
+		//if (searchInProject) {
+		//	objs = Resources.FindObjectsOfTypeAll(classTyp);
+		//	foreach (var item in objs) {
+		//		Debug.Log("project item: "+ item);
+		//		GameObject itemGO = null;
+		//		MonoBehaviour itemMB = item as MonoBehaviour;
+		//		if (itemMB != null) itemGO = itemMB.gameObject;
+		//		if (itemGO != null && !foundList.Contains(itemGO)) {
+		//			foundList.Add(itemGO);
+		//			Debug.Log("project itemGO: " + itemGO + ", root: "+ itemGO.transform.root.gameObject);
+		//		}
+		//	}
+		//}
 
 		//Replace
-		//foreach (var item in foundList) {
-		//	ReplaceGameObject(item);
-		//}
+		foreach (var item in foundList) {
+			//TODO CHECK IF SCENE- OR ASSET OBJECT?
+			ReplaceSceneObject(item);
+		}
 	}
 
-	private void ReplaceGameObject(GameObject origGO) {
+	//private void ReplaceAsset(GameObject origGO) {
+	//	GameObject newGO = Instantiate(replaceGO);
+
+	//	newGO.transform.localPosition = origGO.transform.localPosition;
+	//	newGO.transform.localScale = origGO.transform.localScale;
+	//	newGO.transform.localRotation = origGO.transform.localRotation;
+	//	newGO.name = origGO.name;
+
+	//	PrefabUtility.ReplacePrefab(newGO, origGO);
+	//}
+
+	private void ReplaceSceneObject(GameObject origGO) {
 		GameObject newGO = Instantiate(replaceGO);
 //			GameObject newGO = (GameObject) PrefabUtility.InstantiatePrefab((Object)replaceGO);
 

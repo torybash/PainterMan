@@ -32,7 +32,7 @@ public class Spikes : TileObject {
 
 	public override TileObjectInteractionResult PlayerEntered() {
 		if (spikesDef.isRaised) {
-			return TileObjectInteractionResult.KillResult();
+			return new TileObjectInteractionResult(TileObjectInteractionResultType.Kill);
 		}
 		return TileObjectInteractionResult.Empty();
 	}
@@ -47,7 +47,7 @@ public class Spikes : TileObject {
 	
 	#if UNITY_EDITOR
 	void OnValidate(){
-		Refresh();
+		//Refresh();
 	}
 	#endif
 }

@@ -1,0 +1,19 @@
+﻿using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+public class #CLASSNAME# : TileObject {
+
+	[SerializeField] #DEFINITION_CLASSNAME# #DEFINITION_VARNAME#;
+
+	public override TileObjectDefintion ToDef {
+		get {return #DEFINITION_VARNAME#;}
+		set {#DEFINITION_VARNAME# = (#DEFINITION_CLASSNAME#) value;}
+	}
+}
+
+[System.Serializable]
+public class #DEFINITION_CLASSNAME# : TileObjectDefintion{
+	
+}

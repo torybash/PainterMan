@@ -123,13 +123,13 @@ public class Library<T> : MonoBehaviour where T : MonoBehaviour {
 							return prefabObj;
 						//}
 
-						_instance = Instantiate(prefabObj).GetComponent<T>();
-						_instance.gameObject.name = "(Library) " + typeof(T).ToString();
+						//_instance = Instantiate(prefabObj).GetComponent<T>();
+						//_instance.gameObject.name = "(Library) " + typeof(T).ToString();
 
-						DontDestroyOnLoad(_instance);
+						//DontDestroyOnLoad(_instance);
 
-						Debug.Log("[Library] An instance of " + typeof(T) + " is needed in the scene, so '" + prefabObj.gameObject +
-							"' was created with DontDestroyOnLoad.");
+						//Debug.Log("[Library] An instance of " + typeof(T) + " is needed in the scene, so '" + prefabObj.gameObject +
+						//	"' was created with DontDestroyOnLoad.");
 					}
 				}
 

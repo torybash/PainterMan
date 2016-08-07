@@ -74,7 +74,7 @@ public class Tile : ProBehaviour {
 				if (GameRules.PaintGradient) {
 					fracDry = 1f - (Game.I.Turn - 1 - tileDef.paintedTurn) / (float) GameRules.GetTimeToDry(tileDef.color);
 				}
-				Debug.Log("fracDry: "+ fracDry + ", tileDef.paintedTurn: " + tileDef.paintedTurn + ", Game.I.Turn: " + Game.I.Turn + ", GameRules.GetTimeToDry(tileDef.color): " + GameRules.GetTimeToDry(tileDef.color));
+				//Debug.Log("fracDry: "+ fracDry + ", tileDef.paintedTurn: " + tileDef.paintedTurn + ", Game.I.Turn: " + Game.I.Turn + ", GameRules.GetTimeToDry(tileDef.color): " + GameRules.GetTimeToDry(tileDef.color));
 
 				//TileSR.color = SpriteLibrary.GetTileColor(tileDef.color);
 				//TileSR.color = new Color(TileSR.color.r * fracDry, TileSR.color.g * fracDry, TileSR.color.b * fracDry);
@@ -91,7 +91,7 @@ public class Tile : ProBehaviour {
 
 	#if UNITY_EDITOR
 	void OnValidate(){
-		Refresh();
+		//Refresh();
 	}
 
 	#endif

@@ -46,9 +46,9 @@ public class ProBehaviour : MonoBehaviour {
 	private Color GetNewTagColor() {
 		Color newColor = new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
 		if (DBG.DbgTags != null) { //TODO clever stuff
-			foreach (var tag in DBG.DbgTags.tags) {
+			//foreach (var tag in DBG.DbgTags.tags) {
 				//tag.color
-			}
+			//}
 		}
 		return newColor;
 	}

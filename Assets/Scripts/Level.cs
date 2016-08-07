@@ -50,10 +50,8 @@ public class Level : ProBehaviour {
 
 	#region TileMap Wrappers
 	public Vec2i GetStartPos(){
-		return tileMap.GetTileOfType(TileType.Start).Pos;
-	}
-	public List<T> GetAllTOOfType<T>() where T : TileObject{
-		return tileMap.GetAllTOOfType<T>();
+		//return tileMap.GetTileOfType(TileType.Start).Pos;
+		return tileMap.GetTOOfType<Entrance>().ToDef.pos;
 	}
 	public Vector2 GetCenterPos() {
 		Vector4 extremes = new Vector4(float.MaxValue, float.MinValue, float.MaxValue, float.MinValue); //min x, max x, min y, max y
@@ -126,15 +124,18 @@ public class Level : ProBehaviour {
 
 	#region Editor
 	[HideInInspector][SerializeField] public LevelEditor.ControlType currControl;
+	[HideInInspector][SerializeField] public int currTileObjectIdx;
+	[HideInInspector][SerializeField] public int lastTileObjectIdx = -1;
 
 	[HideInInspector][SerializeField] public TileType tileType; 
 	[HideInInspector][SerializeField] public TileColor tileGoalColor; 
 	[HideInInspector][SerializeField] public TileColor tileColor; 
 
 	[HideInInspector][SerializeField] public TileObject tileObjectPrefab; 
+	[HideInInspector][SerializeField] public TileObjectDefintion tileObjectDefinition; 
 
 	[HideInInspector][SerializeField] public Texture boxTex; 
-	[HideInInspector][SerializeField] public Rect boxTexRect; 
+	[SerializeField] public Rect boxTexRect; 
 	[HideInInspector][SerializeField] GameObject tileCont;
 	[HideInInspector][SerializeField] GameObject toCont;
 
@@ -220,7 +221,7 @@ public class LevelEditor : Editor {
 	private bool altDown = false;
 	private bool ctrlDown = false;
 
-	private int currTileObjectIdx;
+
 	private string[] tileObjectNames;
 	public string[] TileObjectNames {
 		get {
@@ -236,22 +237,25 @@ public class LevelEditor : Editor {
 
 	void OnEnable()
 	{
-		Debug.Log("[LevelEditor] OnEnable");
+		//Debug.Log("[LevelEditor] OnEnable");
 		Tools.hidden = true;
 		Lvl.Map.CleanLists();
 	}
  
 	void OnDisable()
 	{
-		Debug.Log("[LevelEditor] OnDisable");
+		//Debug.Log("[LevelEditor] OnDisable");
 		Tools.hidden = false;
 		Lvl.Map.CleanLists();
 	}
- 
 
-	//private SerializedObject toDefintionSO;
-	//private SerializedProperty toDefinitionProp;
-	//private void SetTODefintion(Object obj) {
+
+
+
+
+	private SerializedObject toDefintionSO;
+	private SerializedProperty toDefinitionProp;
+	//private void SetTODefintion(UnityEngine.Object obj) {
 	//	if (obj == null) return;
 	//	toDefintionSO = new SerializedObject(obj);
 	//	toDefinitionProp = toDefintionSO.FindProperty("def");
@@ -296,7 +300,7 @@ public class LevelEditor : Editor {
 
 		#region Handles GUI
 		Handles.BeginGUI( );
-		Rect rect = new Rect(0, 0, 150, Screen.height);
+		Rect rect = new Rect(0, 0, 300, Screen.height);
 		if (Lvl.boxTex != null) {
 			//Debug.Log("Lvl.boxTexRect: " + Lvl.boxTexRect);
 			GUI.color = new Color32(255, 255, 255, 127);
@@ -341,16 +345,62 @@ public class LevelEditor : Editor {
 		if (toToggle) Lvl.currControl = ControlType.TileObject; 
 		GUILayout.EndHorizontal();
 
-		currTileObjectIdx = EditorGUILayout.Popup(currTileObjectIdx, TileObjectNames);
-		if (Lvl.tileObjectPrefab != null) {
-			foreach (var fieldInfo in Lvl.tileObjectPrefab.ToDef.GetType().GetFields()) {
-				//if (fieldInfo.Name == "pos" || fieldInfo.Name == "className") continue;
-				GUILayout.Label(fieldInfo.Name);
+		Lvl.currTileObjectIdx = EditorGUILayout.Popup(Lvl.currTileObjectIdx, TileObjectNames);
+		if (Lvl.tileObjectPrefab != null && Lvl.tileObjectDefinition != null) {
+			foreach (var field in Lvl.tileObjectDefinition.GetType().GetFields()) {
+				if (field.Name == "pos" || field.Name == "className") continue;
+				GUILayout.Label(field.Name);
+
+				object fieldVal = field.GetValue(Lvl.tileObjectDefinition);
+				if (field.FieldType == typeof(int)) {
+					var val = EditorGUILayout.IntField((int)fieldVal);
+					field.SetValue(Lvl.tileObjectDefinition, val);
+				} else if (field.FieldType == typeof(bool)) {
+					var val = EditorGUILayout.Toggle((bool)fieldVal);
+					field.SetValue(Lvl.tileObjectDefinition, val);
+				}else if (field.FieldType == typeof(string)) {
+					var val = EditorGUILayout.TextField((string)fieldVal);
+					field.SetValue(Lvl.tileObjectDefinition, val);
+				}else if (field.FieldType == typeof(float)) {
+					var val = EditorGUILayout.FloatField((float)fieldVal);
+					field.SetValue(Lvl.tileObjectDefinition, val);
+				}else if (field.FieldType.IsEnum) {
+					var val = EditorGUILayout.EnumPopup((Enum)fieldVal);
+					field.SetValue(Lvl.tileObjectDefinition, val);
+				}
+				EditorUtility.SetDirty(Lvl);
+
+				//Debug.Log("Lvl.tileObjectPrefab.ToDef.GetType(): " + Lvl.tileObjectPrefab.ToDef.GetType());
+				//var obj = ScriptableObject.CreateInstance<TileObjectDefintionHolder>();
+				//obj.Init(Lvl.tileObjectPrefab.ToDef.GetType());
+				//Debug.Log("obj: " + obj);
+
+				//ScriptableObject defObj = ScriptableObject.CreateInstance(Lvl.tileObjectDefinition.GetType());
+
+				//if (defObj != null) {
+				//	SerializedObject serDefObj = new UnityEditor.SerializedObject(defObj);
+				//	//SerializedProperty defObjProp = serializedObject.FindProperty("defObj");
+				//	//SerializedProperty defTypeProp = serializedObject.FindProperty("defType");
+				//	//SerializedProperty numProp = serializedObject.FindProperty("num");
+
+				//	Debug.Log("defObj: " + defObj + ", serDefObj: " + serDefObj);
+				//	//Debug.Log("defTypeProp: " + defTypeProp + ", numProp: " + numProp);
+				//	foreach (var item in serDefObj.targetObjects) {
+				//		Debug.Log("serDefObj.item: " + item);
+				//	}
+				//	if (defObj != null && serDefObj.FindProperty(fieldInfo.Name) != null) {
+				//		EditorGUILayout.PropertyField(serDefObj.FindProperty(fieldInfo.Name), GUIContent.none, true);						
+				//	}
+				//}
+
+
 				//if (toDefinitionProp != null && toDefinitionProp.FindPropertyRelative(fieldInfo.Name) != null) {
 				//	EditorGUILayout.PropertyField(toDefinitionProp.FindPropertyRelative(fieldInfo.Name), GUIContent.none);
 				//}
 				//EditorGUILayout.field
 				//new UnityEditor.SerializedObject()
+
+
 			}
 		}
 
@@ -439,7 +489,11 @@ public class LevelEditor : Editor {
 		}
 
 		if (GUI.changed) {
-			Lvl.tileObjectPrefab = PrefabLibrary.I.TileObjectPrefabs[currTileObjectIdx];
+			if (Lvl.currTileObjectIdx != Lvl.lastTileObjectIdx) {
+				Lvl.tileObjectPrefab = PrefabLibrary.I.TileObjectPrefabs[Lvl.currTileObjectIdx];
+				Lvl.tileObjectDefinition = (TileObjectDefintion) Activator.CreateInstance(Lvl.tileObjectPrefab.ToDef.GetType());
+				Lvl.lastTileObjectIdx = Lvl.currTileObjectIdx;
+			}
 			Lvl.Map.CleanLists();
 			EditorUtility.SetDirty(Lvl);
 		}
@@ -497,8 +551,11 @@ public class LevelEditor : Editor {
 		if (!Lvl.Map.HasTOTypeAtPos(tilePos, Lvl.tileObjectPrefab.GetType())) { //if tile not already contains type
 			string className = Lvl.tileObjectPrefab.GetType().FullName + ", " + Lvl.tileObjectPrefab.GetType().Assembly.GetName().Name;
 			//Lvl.tileObjectPrefab.ToDef
-			TileObjectDefintion toDef = new TileObjectDefintion { pos = tilePos, className = className };
-			TileObject to = Lvl.CreateTOAtPos(Lvl.tileObjectPrefab, toDef);
+			//TileObjectDefintion toDef = new TileObjectDefintion { pos = tilePos, className = className };
+			Debug.Log("PlacedTO - Lvl.tileObjectDefinition: " + Lvl.tileObjectDefinition + ", typ: " + Lvl.tileObjectDefinition.GetType());
+			Lvl.tileObjectDefinition.pos = tilePos;
+			Lvl.tileObjectDefinition.className = className;
+			TileObject to = Lvl.CreateTOAtPos(Lvl.tileObjectPrefab, Lvl.tileObjectDefinition);
 			Undo.RegisterCreatedObjectUndo(to.gameObject, "Create TileObject");
 		}
 
@@ -526,5 +583,89 @@ public class LevelEditor : Editor {
 
 }
 
+//[Serializable]
+//public class TileObjectDefintionHolder : ScriptableObject, ISerializationCallbackReceiver {
+
+//	public System.Object defObj;
+
+//	[SerializeField, HideInInspector]
+//    private string defSerialized = "";
+	
+//	public void Init(Type defType) {
+//		Debug.Log("[TileObjectDefintionHolder] Init - defType: " + defType);
+//		defObj = Activator.CreateInstance(defType);
+//		Debug.Log("defObj: " + defObj + ", defObj.type: "+ defObj.GetType());
+		
+//	}
+
+//	public void OnBeforeSerialize() {
+//		Debug.Log("OnBeforeSerialize!");
+//		if (defObj == null) {
+//			defSerialized = "n";
+//			return;
+//		}
+//		defSerialized = "" + defObj.GetType() + ":";
+//		for (int i = 0; i < defObj.GetType().GetFields().Length; i++) {
+//			var field = defObj.GetType().GetFields()[i];
+
+//			var fieldType = field.FieldType;
+//			object fieldVal = field.GetValue(defObj);
+//			if (fieldType == typeof(int))
+//				defSerialized += fieldVal;
+//			else if (fieldType == typeof(float))
+//				defSerialized += fieldVal;
+//			else if (fieldType == typeof(Color)) {
+//				Color32 c = (Color)fieldVal;
+//				int v = (int)c.r + (int)c.g << 8 + (int)c.b << 16 + (int)c.a << 24;
+//				defSerialized += v;
+//			} else if (fieldType == typeof(Vector3)) {
+//				Vector3 v = (Vector3)fieldVal;
+//				defSerialized += v.x + "|" + v.y + "|" + v.z;
+//			}
+
+//			defSerialized += ",";
+//		}
+//	}
+
+//	public void OnAfterDeserialize() {
+//		Debug.Log("OnAfterDeserialize! - defSerialized: "+ defSerialized);
+//		if (defSerialized.Length == 0)
+//			return;
+//		char type = defSerialized[0];
+//		if (type == 'n')
+//			defObj = null;
+//		int idx = defSerialized.IndexOf(":");
+//		string typeName = defSerialized.Substring(0, idx);
+//		defObj = Activator.CreateInstance(Type.GetType(typeName));
+//		defSerialized = defSerialized.Split(":".ToCharArray()[0])[1];
+
+//		string[] fieldVals = defSerialized.Split(",".ToCharArray()[0]);
+
+//		for (int i = 0; i < defObj.GetType().GetFields().Length; i++) {
+//			var field = defObj.GetType().GetFields()[i];
+//			Type fieldType = field.FieldType;
+//			if (fieldType == typeof(int)) {
+//				int val = int.Parse(fieldVals[i]);
+//				field.SetValue(defObj, val);
+//				//defSerialized += "i" + fieldVal;
+//			} else if (fieldType == typeof(float)) {
+//				//defSerialized += "f" + fieldVal;
+//			} else if (fieldType == typeof(Color)) {
+//				//Color32 c = (Color)fieldVal;
+//				//int v = (int)c.r + (int)c.g << 8 + (int)c.b << 16 + (int)c.a << 24;
+//				//defSerialized += "c" + v;
+//			} else if (fieldType == typeof(Vector3)) {
+//				//Vector3 v = (Vector3)fieldVal;
+//				//defSerialized += "v" + v.x + "|" + v.y + "|" + v.z;
+//			}
+//				//field.SetValue(defObj, );
+//		}
+//		//for (int i = 0; i < fieldVals; i++) {
+
+//		//}
+//	}
+
+	
+//}
 
 #endif
