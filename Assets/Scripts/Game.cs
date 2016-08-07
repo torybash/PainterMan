@@ -123,6 +123,7 @@ public class Game : Controller<Game> {
 			if (sliding) {
 				if (GameRules.TurnsCountWhenSliding) turn++;
 				ExecuteMove(playerPos, dir);
+				return;
 			}
 
 			//Go to next turn
