@@ -371,28 +371,29 @@ public class LevelEditor : Editor {
 			} else {
 				if (current.keyCode == KeyCode.Tab) {
 					Lvl.currControl = (ControlType)((((int)Lvl.currControl) + 1) % System.Enum.GetValues(typeof(ControlType)).Length);
-				} 
-				//else if (current.keyCode == KeyCode.R) {
-				//	Lvl.tileGoalColor = TileColor.Red;
-				//} else if (current.keyCode == KeyCode.G) {
-				//	Lvl.tileGoalColor = TileColor.Green;
-				//} else if (current.keyCode == KeyCode.B) {
-				//	Lvl.tileGoalColor = TileColor.Blue;
-				//} else if (current.keyCode == KeyCode.N) {
-				//	Lvl.tileGoalColor = TileColor.None;
+				} else if (current.keyCode == KeyCode.R) {
+					SetColor(TileColor.Red);
+				} else if (current.keyCode == KeyCode.G) {
+					SetColor(TileColor.Green);
+				} else if (current.keyCode == KeyCode.B) {
+					SetColor(TileColor.Blue);
+				} else if (current.keyCode == KeyCode.N) {
+					SetColor(TileColor.None);
 
-				//} else if (current.keyCode == KeyCode.C) {
-				//	Lvl.tileGoalColor = TileColor.Cyan;
-				//} else if (current.keyCode == KeyCode.M) {
-				//	Lvl.tileGoalColor = TileColor.Magneta;
-				//} else if (current.keyCode == KeyCode.Y) {
-				//	Lvl.tileGoalColor = TileColor.Yellow;
+				} else if (current.keyCode == KeyCode.C) {
+					SetColor(TileColor.Cyan);
+				} else if (current.keyCode == KeyCode.M) {
+					SetColor(TileColor.Magneta);
+				} else if (current.keyCode == KeyCode.Y) {
+					SetColor(TileColor.Yellow);
 
-				//} else if (current.keyCode == KeyCode.Q) {
-				//	Lvl.tileGoalColor = (TileColor)((((int)Lvl.tileGoalColor) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
-				//} else if (current.keyCode == KeyCode.W) {
-				//	Lvl.tileGoalColor = (TileColor)(((int)Lvl.tileGoalColor) - 1 < 0 ? System.Enum.GetValues(typeof(TileColor)).Length - 1 : ((int)Lvl.tileGoalColor) - 1);
-				//}
+				} else if (current.keyCode == KeyCode.Q) {
+					ChangeColor(1);
+					//Lvl.tileGoalColor = (TileColor)((((int)Lvl.tileGoalColor) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
+				} else if (current.keyCode == KeyCode.W) {
+					ChangeColor(-1);
+					//Lvl.tileGoalColor = (TileColor)(((int)Lvl.tileGoalColor) - 1 < 0 ? System.Enum.GetValues(typeof(TileColor)).Length - 1 : ((int)Lvl.tileGoalColor) - 1);
+				}
 			}
 			Event.current.Use();
 			GUI.changed = true;
@@ -441,6 +442,28 @@ public class LevelEditor : Editor {
 		}
     }
 
+	private void SetColor(TileColor color) {
+		if (Lvl.tileObjectPrefab.GetType() == typeof(PaintBucket) ) {
+			((PaintBucketDefinition)Lvl.tileObjectDefinition).color = color;
+		}else if (Lvl.tileObjectPrefab.GetType() == typeof(Exit) ) {
+			((ExitDefinition)Lvl.tileObjectDefinition).color = color;
+		}
+	}
+
+	private void ChangeColor(int change) {
+		if (Lvl.tileObjectPrefab.GetType() != typeof(PaintBucket) && Lvl.tileObjectPrefab.GetType() != typeof(Exit)) return;
+
+		TileColor oldCol = TileColor.None;
+		if (Lvl.tileObjectPrefab.GetType() == typeof(PaintBucket)) {
+			oldCol = ((PaintBucketDefinition)Lvl.tileObjectDefinition).color;
+		} else if (Lvl.tileObjectPrefab.GetType() == typeof(Exit)) {
+			oldCol = ((ExitDefinition)Lvl.tileObjectDefinition).color;
+		}
+		TileColor newCol = (TileColor)((((int)oldCol) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
+		if (change == 1) newCol = (TileColor)((((int)oldCol) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
+		else if (change == -1) newCol = (TileColor)(((int)oldCol) - 1 < 0 ? System.Enum.GetValues(typeof(TileColor)).Length - 1 : ((int)oldCol) - 1);
+		SetColor(newCol);
+	}
 
 	private void NumberPressed(int number) {
 		D.Log("[LevelEditor] NumberPressed: " + number);
