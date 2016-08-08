@@ -6,7 +6,7 @@ public class Spikes : TileObject {
 	
 	[SerializeField] SpikesDefintion spikesDef;
 
-	[SerializeField] SpriteRenderer spikesRend;
+	//[SerializeField] SpriteRenderer spikesRend;
 
 	private const string raisedSpriteName = "to_SpikesUp";
 	private const string loweredSpriteName = "to_SpikesDown";
@@ -37,19 +37,12 @@ public class Spikes : TileObject {
 		return TileObjectInteractionResult.Empty();
 	}
 
-	private void Refresh() {
-		if (spikesDef == null || spikesRend == null) return;
-		if (spikesDef.isRaised) spikesRend.sprite = SpriteLibrary.GetSprite(raisedSpriteName);
-		else spikesRend.sprite = SpriteLibrary.GetSprite(loweredSpriteName);
+	protected override void Refresh() {
+		if (spikesDef == null || _mainSR == null) return;
+		if (spikesDef.isRaised) _mainSR.sprite = SpriteLibrary.GetSprite(raisedSpriteName);
+		else _mainSR.sprite = SpriteLibrary.GetSprite(loweredSpriteName);
 	}
 
-
-	
-	#if UNITY_EDITOR
-	void OnValidate(){
-		//Refresh();
-	}
-	#endif
 }
 
 

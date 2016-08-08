@@ -41,6 +41,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edb06b7a06871b4d93fc6c51ed5d4fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 21228590}
   def:
     pos:
       x: 0

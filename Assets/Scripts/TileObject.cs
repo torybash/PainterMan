@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public abstract class TileObject : MonoBehaviour{
 
+	[SerializeField] protected SpriteRenderer _mainSR;
 
 	public abstract TileObjectDefintion ToDef { get; set; }
 
@@ -19,6 +20,13 @@ public abstract class TileObject : MonoBehaviour{
 
 	public virtual void Init() {}
 	public virtual void UpdateTO() {}
+	protected virtual void Refresh() {}
+
+	void OnValidate() {
+#if UNITY_EDITOR
+		Refresh();
+#endif
+	}
 }
 
 [System.Serializable]

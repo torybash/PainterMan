@@ -41,11 +41,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004bdfdd8fef46447b44e8c2567f9b50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _soDef:
-    pos:
-      x: 0
-      y: 0
-    className: 
+  _mainSR: {fileID: 21211996}
   _paintBucketDef:
     pos:
       x: 0

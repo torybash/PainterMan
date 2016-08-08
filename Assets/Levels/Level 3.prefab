@@ -2762,6 +2762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004bdfdd8fef46447b44e8c2567f9b50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 0}
   _paintBucketDef:
     pos:
       x: 1
@@ -2927,6 +2928,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004bdfdd8fef46447b44e8c2567f9b50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 0}
   _paintBucketDef:
     pos:
       x: 3
@@ -3050,6 +3052,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df7f161bd72e8d419c0ddbc57d18e61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 0}
   _entranceDef:
     pos:
       x: 0
@@ -3150,6 +3153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004bdfdd8fef46447b44e8c2567f9b50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 0}
   _paintBucketDef:
     pos:
       x: -1
@@ -3314,9 +3318,6 @@ MonoBehaviour:
   currControl: 0
   currTileObjectIdx: 0
   lastTileObjectIdx: -1
-  tileType: 1
-  tileGoalColor: 2
-  tileColor: 2
   tileObjectPrefab: {fileID: 11401400, guid: 101c2df2fdecb2849b7c05b635d212a7, type: 2}
   tileObjectDefinition:
     pos:
@@ -3343,11 +3344,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44c785f8ba1a2874c8b3c1bee3af9afa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 0}
   _exitDef:
     pos:
       x: 2
       y: 5
     className: Exit
+    color: 0
 --- !u!114 &11481136
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3359,6 +3362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004bdfdd8fef46447b44e8c2567f9b50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 0}
   _paintBucketDef:
     pos:
       x: 1

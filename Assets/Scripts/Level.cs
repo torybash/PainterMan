@@ -127,9 +127,9 @@ public class Level : ProBehaviour {
 	[HideInInspector][SerializeField] public int currTileObjectIdx;
 	[HideInInspector][SerializeField] public int lastTileObjectIdx = -1;
 
-	[HideInInspector][SerializeField] public TileType tileType; 
-	[HideInInspector][SerializeField] public TileColor tileGoalColor; 
-	[HideInInspector][SerializeField] public TileColor tileColor; 
+	//[HideInInspector][SerializeField] public TileType tileType; 
+	//[HideInInspector][SerializeField] public TileColor tileGoalColor; 
+	//[HideInInspector][SerializeField] public TileColor tileColor; 
 
 	[HideInInspector][SerializeField] public TileObject tileObjectPrefab; 
 	[HideInInspector][SerializeField] public TileObjectDefintion tileObjectDefinition; 
@@ -218,8 +218,6 @@ public class LevelEditor : Editor {
 
 	private Level Lvl { get { return (Level)target; } }
 	private Event current;
-	private bool altDown = false;
-	private bool ctrlDown = false;
 
 
 	private string[] tileObjectNames;
@@ -228,50 +226,26 @@ public class LevelEditor : Editor {
 			if (tileObjectNames == null) {
 				tileObjectNames = new string[PrefabLibrary.I.TileObjectPrefabs.Count];
 				for (int i = 0; i < tileObjectNames.Length; i++) {
-					tileObjectNames[i] = PrefabLibrary.I.TileObjectPrefabs[i].GetType().Name;
+					tileObjectNames[i] = "" + (i + 1) + ". " + PrefabLibrary.I.TileObjectPrefabs[i].GetType().Name;
 				}
 			}
 			return tileObjectNames;
 		}
 	}
 
-	void OnEnable()
-	{
+	void OnEnable(){
 		//Debug.Log("[LevelEditor] OnEnable");
 		Tools.hidden = true;
 		Lvl.Map.CleanLists();
 	}
  
-	void OnDisable()
-	{
+	void OnDisable(){
 		//Debug.Log("[LevelEditor] OnDisable");
 		Tools.hidden = false;
 		Lvl.Map.CleanLists();
 	}
 
 
-
-
-
-	private SerializedObject toDefintionSO;
-	private SerializedProperty toDefinitionProp;
-	//private void SetTODefintion(UnityEngine.Object obj) {
-	//	if (obj == null) return;
-	//	toDefintionSO = new SerializedObject(obj);
-	//	toDefinitionProp = toDefintionSO.FindProperty("def");
-	//}
-
-	//private TileObjectDefintionHolder<TileObjectDefintion> toDefHolder;
-	//private TileObjectDefintionHolder<TileObjectDefintion> TODefHolder {
-	//	get {
-	//		if (toDefHolder == null) {
-	//			toDefHolder = ScriptableObject.CreateInstance<TileObjectDefintionHolder<TileObjectDefintion>>();
-	//		}
-	//		return toDefHolder;
-	//	}
-	//}
-
-	//private Texture boxTex;
 	public Texture SetBoxTex(Rect rect) {
 		if (Lvl.boxTex == null) {
 			Texture2D tex2D = new Texture2D((int)rect.width, (int)rect.height, TextureFormat.RGBA32, false, false);
@@ -297,12 +271,10 @@ public class LevelEditor : Editor {
 		current = Event.current;
 		int controlID = GUIUtility.GetControlID(HintID, FocusType.Passive);
 
-
 		#region Handles GUI
 		Handles.BeginGUI( );
 		Rect rect = new Rect(0, 0, 300, Screen.height);
 		if (Lvl.boxTex != null) {
-			//Debug.Log("Lvl.boxTexRect: " + Lvl.boxTexRect);
 			GUI.color = new Color32(255, 255, 255, 127);
 			GUI.Box(Lvl.boxTexRect, Lvl.boxTex);
 			GUI.color = Color.white;
@@ -318,24 +290,24 @@ public class LevelEditor : Editor {
 		if (disabledToggle) Lvl.currControl = ControlType.Disabled; 
 		GUILayout.EndHorizontal();
 
+		EditorGUILayout.Space();
 
 		GUILayout.BeginHorizontal();
 		EditorGUILayout.LabelField("" + (Lvl.currControl == ControlType.TilePaint ? ">>" : "") + "Tile paint", EditorStyles.boldLabel, GUILayout.Width(rect.width - 25));
 		bool paintToggle = EditorGUILayout.Toggle(Lvl.currControl == ControlType.TilePaint);
 		if (paintToggle) Lvl.currControl = ControlType.TilePaint; 
 		GUILayout.EndHorizontal();
-		Lvl.tileType = (TileType)EditorGUILayout.EnumPopup(Lvl.tileType);
-		if (SpriteLibrary.GetTileSprite(Lvl.tileType) != null) {
-			GUILayout.Box(SpriteLibrary.GetTileSprite(Lvl.tileType).texture, GUILayout.Width(60), GUILayout.Height(60));
-		}
 
-		EditorGUILayout.LabelField("Start color");
-		Lvl.tileColor = (TileColor)EditorGUILayout.EnumPopup(Lvl.tileColor);
-		EditorGUILayout.ColorField(GUIContent.none, SpriteLibrary.GetTileColor(Lvl.tileColor), false, false, false, null);
-
-		EditorGUILayout.LabelField("Goal color");
-		Lvl.tileGoalColor = (TileColor)EditorGUILayout.EnumPopup(Lvl.tileGoalColor);
-		EditorGUILayout.ColorField(GUIContent.none, SpriteLibrary.GetTileColor(Lvl.tileGoalColor), false, false, false, null);
+		//Lvl.tileType = (TileType)EditorGUILayout.EnumPopup(Lvl.tileType);
+		//if (SpriteLibrary.GetTileSprite(Lvl.tileType) != null) {
+		//	GUILayout.Box(SpriteLibrary.GetTileSprite(Lvl.tileType).texture, GUILayout.Width(60), GUILayout.Height(60));
+		//}
+		//EditorGUILayout.LabelField("Start color");
+		//Lvl.tileColor = (TileColor)EditorGUILayout.EnumPopup(Lvl.tileColor);
+		//EditorGUILayout.ColorField(GUIContent.none, SpriteLibrary.GetTileColor(Lvl.tileColor), false, false, false, null);
+		//EditorGUILayout.LabelField("Goal color");
+		//Lvl.tileGoalColor = (TileColor)EditorGUILayout.EnumPopup(Lvl.tileGoalColor);
+		//EditorGUILayout.ColorField(GUIContent.none, SpriteLibrary.GetTileColor(Lvl.tileGoalColor), false, false, false, null);
 
 		EditorGUILayout.Space();
 		GUILayout.BeginHorizontal();
@@ -346,6 +318,9 @@ public class LevelEditor : Editor {
 		GUILayout.EndHorizontal();
 
 		Lvl.currTileObjectIdx = EditorGUILayout.Popup(Lvl.currTileObjectIdx, TileObjectNames);
+		if (Lvl.tileObjectPrefab != null && Lvl.tileObjectPrefab.GetComponent<SpriteRenderer>() != null) {
+			GUILayout.Box(Lvl.tileObjectPrefab.GetComponent<SpriteRenderer>().sprite.texture, GUILayout.Width(60), GUILayout.Height(60));
+		}
 		if (Lvl.tileObjectPrefab != null && Lvl.tileObjectDefinition != null) {
 			foreach (var field in Lvl.tileObjectDefinition.GetType().GetFields()) {
 				if (field.Name == "pos" || field.Name == "className") continue;
@@ -369,38 +344,6 @@ public class LevelEditor : Editor {
 					field.SetValue(Lvl.tileObjectDefinition, val);
 				}
 				EditorUtility.SetDirty(Lvl);
-
-				//Debug.Log("Lvl.tileObjectPrefab.ToDef.GetType(): " + Lvl.tileObjectPrefab.ToDef.GetType());
-				//var obj = ScriptableObject.CreateInstance<TileObjectDefintionHolder>();
-				//obj.Init(Lvl.tileObjectPrefab.ToDef.GetType());
-				//Debug.Log("obj: " + obj);
-
-				//ScriptableObject defObj = ScriptableObject.CreateInstance(Lvl.tileObjectDefinition.GetType());
-
-				//if (defObj != null) {
-				//	SerializedObject serDefObj = new UnityEditor.SerializedObject(defObj);
-				//	//SerializedProperty defObjProp = serializedObject.FindProperty("defObj");
-				//	//SerializedProperty defTypeProp = serializedObject.FindProperty("defType");
-				//	//SerializedProperty numProp = serializedObject.FindProperty("num");
-
-				//	Debug.Log("defObj: " + defObj + ", serDefObj: " + serDefObj);
-				//	//Debug.Log("defTypeProp: " + defTypeProp + ", numProp: " + numProp);
-				//	foreach (var item in serDefObj.targetObjects) {
-				//		Debug.Log("serDefObj.item: " + item);
-				//	}
-				//	if (defObj != null && serDefObj.FindProperty(fieldInfo.Name) != null) {
-				//		EditorGUILayout.PropertyField(serDefObj.FindProperty(fieldInfo.Name), GUIContent.none, true);						
-				//	}
-				//}
-
-
-				//if (toDefinitionProp != null && toDefinitionProp.FindPropertyRelative(fieldInfo.Name) != null) {
-				//	EditorGUILayout.PropertyField(toDefinitionProp.FindPropertyRelative(fieldInfo.Name), GUIContent.none);
-				//}
-				//EditorGUILayout.field
-				//new UnityEditor.SerializedObject()
-
-
 			}
 		}
 
@@ -421,37 +364,35 @@ public class LevelEditor : Editor {
 		switch (current.type) {
 		case EventType.keyDown:
 			Debug.Log("KeyDown: " + current.keyCode);
-			//if (current.keyCode == KeyCode.LeftAlt || current.keyCode == KeyCode.RightAlt) { altDown = !altDown;}
-			//else if (current.keyCode == KeyCode.LeftControl || current.keyCode == KeyCode.RightControl) ctrlDown = !ctrlDown;
-			//else 
+
 			if (InputHelper.GetNumberPressed(current.keyCode) != -1) {
 				NumberPressed(InputHelper.GetNumberPressed(current.keyCode));
 				current.Use();
 			} else {
 				if (current.keyCode == KeyCode.Tab) {
 					Lvl.currControl = (ControlType)((((int)Lvl.currControl) + 1) % System.Enum.GetValues(typeof(ControlType)).Length);
+				} 
+				//else if (current.keyCode == KeyCode.R) {
+				//	Lvl.tileGoalColor = TileColor.Red;
+				//} else if (current.keyCode == KeyCode.G) {
+				//	Lvl.tileGoalColor = TileColor.Green;
+				//} else if (current.keyCode == KeyCode.B) {
+				//	Lvl.tileGoalColor = TileColor.Blue;
+				//} else if (current.keyCode == KeyCode.N) {
+				//	Lvl.tileGoalColor = TileColor.None;
 
-				} else if (current.keyCode == KeyCode.R) {
-					Lvl.tileGoalColor = TileColor.Red;
-				} else if (current.keyCode == KeyCode.G) {
-					Lvl.tileGoalColor = TileColor.Green;
-				} else if (current.keyCode == KeyCode.B) {
-					Lvl.tileGoalColor = TileColor.Blue;
-				} else if (current.keyCode == KeyCode.N) {
-					Lvl.tileGoalColor = TileColor.None;
+				//} else if (current.keyCode == KeyCode.C) {
+				//	Lvl.tileGoalColor = TileColor.Cyan;
+				//} else if (current.keyCode == KeyCode.M) {
+				//	Lvl.tileGoalColor = TileColor.Magneta;
+				//} else if (current.keyCode == KeyCode.Y) {
+				//	Lvl.tileGoalColor = TileColor.Yellow;
 
-				} else if (current.keyCode == KeyCode.C) {
-					Lvl.tileGoalColor = TileColor.Cyan;
-				} else if (current.keyCode == KeyCode.M) {
-					Lvl.tileGoalColor = TileColor.Magneta;
-				} else if (current.keyCode == KeyCode.Y) {
-					Lvl.tileGoalColor = TileColor.Yellow;
-
-				} else if (current.keyCode == KeyCode.Q) {
-					Lvl.tileGoalColor = (TileColor)((((int)Lvl.tileGoalColor) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
-				} else if (current.keyCode == KeyCode.W) {
-					Lvl.tileGoalColor = (TileColor)(((int)Lvl.tileGoalColor) - 1 < 0 ? System.Enum.GetValues(typeof(TileColor)).Length - 1 : ((int)Lvl.tileGoalColor) - 1);
-				}
+				//} else if (current.keyCode == KeyCode.Q) {
+				//	Lvl.tileGoalColor = (TileColor)((((int)Lvl.tileGoalColor) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
+				//} else if (current.keyCode == KeyCode.W) {
+				//	Lvl.tileGoalColor = (TileColor)(((int)Lvl.tileGoalColor) - 1 < 0 ? System.Enum.GetValues(typeof(TileColor)).Length - 1 : ((int)Lvl.tileGoalColor) - 1);
+				//}
 			}
 			Event.current.Use();
 			GUI.changed = true;
@@ -493,6 +434,7 @@ public class LevelEditor : Editor {
 				Lvl.tileObjectPrefab = PrefabLibrary.I.TileObjectPrefabs[Lvl.currTileObjectIdx];
 				Lvl.tileObjectDefinition = (TileObjectDefintion) Activator.CreateInstance(Lvl.tileObjectPrefab.ToDef.GetType());
 				Lvl.lastTileObjectIdx = Lvl.currTileObjectIdx;
+				Lvl.currControl = ControlType.TileObject;
 			}
 			Lvl.Map.CleanLists();
 			EditorUtility.SetDirty(Lvl);
@@ -501,26 +443,22 @@ public class LevelEditor : Editor {
 
 
 	private void NumberPressed(int number) {
-		D.Log("[LevelEditor] NumberPressed: " + number + ", shiftDown: "+ altDown + ", ctrlDown: "+ ctrlDown);
-		//if (altDown) {
-		//	TileColor typ= TileColor.None;
-		//	Lvl.tileColor = (TileColor) typ.SetToValueByNumber(number);
-		//} else if (ctrlDown) {
-		//	TileColor typ= TileColor.None;
-		//	Lvl.tileGoalColor = (TileColor) typ.SetToValueByNumber(number);
-		//} else {
-			TileType typ= TileType.Empty;
-			//Debug.Log("typ.SetToValueByNumber(number): " + (TileType)typ.SetToValueByNumber(number));
-			Lvl.tileType = (TileType) typ.SetToValueByNumber(number);
-		//}
+		D.Log("[LevelEditor] NumberPressed: " + number);
+
+		//TileType typ= TileType.Empty;
+		//Lvl.tileType = (TileType) typ.SetToValueByNumber(number);
+
+		number = Mathf.Clamp(number - 1, 0, TileObjectNames.Length - 1);
+		Lvl.currTileObjectIdx = number;
 	}
 
 	private void PaintTile() {
 		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Painted tile");
 		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
 		//Debug.Log("[Level] PaintTile - tilePos: " + tilePos);
-		if (Lvl.tileType != TileType.Empty) {
-			TileDefinition tileDef = new TileDefinition { type = Lvl.tileType, goalColor = Lvl.tileGoalColor, color = (Lvl.tileType == TileType.Bucket ? Lvl.tileGoalColor : Lvl.tileColor), pos = tilePos };
+		//if (Lvl.tileType != TileType.Empty) {
+			//TileDefinition tileDef = new TileDefinition { type = Lvl.tileType, goalColor = Lvl.tileGoalColor, color = (Lvl.tileType == TileType.Bucket ? Lvl.tileGoalColor : Lvl.tileColor), pos = tilePos };
+			TileDefinition tileDef = new TileDefinition { type = TileType.Normal, goalColor = TileColor.None, color = TileColor.None, pos = tilePos };
 			if (Lvl.Map.IsValidTile(tilePos)) {
 				Undo.RecordObject(Lvl.Map.GetTile(tilePos), "Painted tile");
 				Lvl.Map.SetTile(tilePos, tileDef);
@@ -528,9 +466,9 @@ public class LevelEditor : Editor {
 				Lvl.CreateTileAtPos(tilePos, tileDef);
 				Undo.RegisterCreatedObjectUndo(Lvl.Map.GetTile(tilePos).gameObject, "Painted tile");
 			}
-		} else {
-			Lvl.Map.DeleteTileAt(tilePos);
-		}
+		//} else {
+		//	Lvl.Map.DeleteTileAt(tilePos);
+		//}
 
 		current.Use();
 	}
@@ -582,90 +520,5 @@ public class LevelEditor : Editor {
 
 
 }
-
-//[Serializable]
-//public class TileObjectDefintionHolder : ScriptableObject, ISerializationCallbackReceiver {
-
-//	public System.Object defObj;
-
-//	[SerializeField, HideInInspector]
-//    private string defSerialized = "";
-	
-//	public void Init(Type defType) {
-//		Debug.Log("[TileObjectDefintionHolder] Init - defType: " + defType);
-//		defObj = Activator.CreateInstance(defType);
-//		Debug.Log("defObj: " + defObj + ", defObj.type: "+ defObj.GetType());
-		
-//	}
-
-//	public void OnBeforeSerialize() {
-//		Debug.Log("OnBeforeSerialize!");
-//		if (defObj == null) {
-//			defSerialized = "n";
-//			return;
-//		}
-//		defSerialized = "" + defObj.GetType() + ":";
-//		for (int i = 0; i < defObj.GetType().GetFields().Length; i++) {
-//			var field = defObj.GetType().GetFields()[i];
-
-//			var fieldType = field.FieldType;
-//			object fieldVal = field.GetValue(defObj);
-//			if (fieldType == typeof(int))
-//				defSerialized += fieldVal;
-//			else if (fieldType == typeof(float))
-//				defSerialized += fieldVal;
-//			else if (fieldType == typeof(Color)) {
-//				Color32 c = (Color)fieldVal;
-//				int v = (int)c.r + (int)c.g << 8 + (int)c.b << 16 + (int)c.a << 24;
-//				defSerialized += v;
-//			} else if (fieldType == typeof(Vector3)) {
-//				Vector3 v = (Vector3)fieldVal;
-//				defSerialized += v.x + "|" + v.y + "|" + v.z;
-//			}
-
-//			defSerialized += ",";
-//		}
-//	}
-
-//	public void OnAfterDeserialize() {
-//		Debug.Log("OnAfterDeserialize! - defSerialized: "+ defSerialized);
-//		if (defSerialized.Length == 0)
-//			return;
-//		char type = defSerialized[0];
-//		if (type == 'n')
-//			defObj = null;
-//		int idx = defSerialized.IndexOf(":");
-//		string typeName = defSerialized.Substring(0, idx);
-//		defObj = Activator.CreateInstance(Type.GetType(typeName));
-//		defSerialized = defSerialized.Split(":".ToCharArray()[0])[1];
-
-//		string[] fieldVals = defSerialized.Split(",".ToCharArray()[0]);
-
-//		for (int i = 0; i < defObj.GetType().GetFields().Length; i++) {
-//			var field = defObj.GetType().GetFields()[i];
-//			Type fieldType = field.FieldType;
-//			if (fieldType == typeof(int)) {
-//				int val = int.Parse(fieldVals[i]);
-//				field.SetValue(defObj, val);
-//				//defSerialized += "i" + fieldVal;
-//			} else if (fieldType == typeof(float)) {
-//				//defSerialized += "f" + fieldVal;
-//			} else if (fieldType == typeof(Color)) {
-//				//Color32 c = (Color)fieldVal;
-//				//int v = (int)c.r + (int)c.g << 8 + (int)c.b << 16 + (int)c.a << 24;
-//				//defSerialized += "c" + v;
-//			} else if (fieldType == typeof(Vector3)) {
-//				//Vector3 v = (Vector3)fieldVal;
-//				//defSerialized += "v" + v.x + "|" + v.y + "|" + v.z;
-//			}
-//				//field.SetValue(defObj, );
-//		}
-//		//for (int i = 0; i < fieldVals; i++) {
-
-//		//}
-//	}
-
-	
-//}
 
 #endif

@@ -29,20 +29,10 @@ public class PaintBucket : TileObject {
 		return new TileObjectInteractionResult(TileObjectInteractionResultType.PickupColor, color:_paintBucketDef.color);
 	}
 
-	private void Refresh() {
+	protected override void Refresh() {
 		if (_bucketRend != null) _bucketRend.color = SpriteLibrary.GetTileColor(_paintBucketDef.color);
 	}
 
-	
-
-	void OnValidate() {
-#if UNITY_EDITOR
-
-		//if (_soDef == null) _soDef = new TileObjectDefintion() ;
-		//Debug.Log("Paintbucket OnValidate - _soDef: " + _soDef);
-		//Refresh();
-#endif
-	}
 }
 
 [System.Serializable]

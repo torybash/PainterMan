@@ -41,11 +41,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44c785f8ba1a2874c8b3c1bee3af9afa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 21211996}
   _exitDef:
     pos:
       x: 0
       y: 0
     className: 
+    color: 0
 --- !u!212 &21211996
 SpriteRenderer:
   m_ObjectHideFlags: 1

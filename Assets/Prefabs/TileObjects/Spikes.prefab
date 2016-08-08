@@ -41,13 +41,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ceac2db4348df44952fd344c35d092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainSR: {fileID: 21244662}
   spikesDef:
     pos:
       x: 0
       y: 0
     className: 
     isRaised: 0
-  spikesRend: {fileID: 21244662}
 --- !u!212 &21244662
 SpriteRenderer:
   m_ObjectHideFlags: 1

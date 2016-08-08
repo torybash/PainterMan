@@ -186,8 +186,10 @@ public class Game : Controller<Game> {
 				break;
 			case TileObjectInteractionResultType.Exit:
 				if (!sliding) {
-					WinLevel();
-					return true;
+					if (((ExitDefinition)to.ToDef).color == TileColor.None || ((ExitDefinition)to.ToDef).color == currPlayerColor) {
+						WinLevel();
+						return true;
+					}
 				}
 				break;
 			default: break;
