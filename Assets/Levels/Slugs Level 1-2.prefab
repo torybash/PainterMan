@@ -1011,6 +1011,7 @@ MonoBehaviour:
       x: 1
       y: 1
     className: Entrance
+    color: 0
 --- !u!212 &212000010447918010
 SpriteRenderer:
   m_ObjectHideFlags: 1

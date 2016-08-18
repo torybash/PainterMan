@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class Exit : TileObject {
 
+	[SerializeField] SpriteRenderer _colorMarkerSR;
+
 	[SerializeField] ExitDefinition _exitDef;
 
 	public override TileObjectDefintion ToDef {
@@ -26,7 +28,14 @@ public class Exit : TileObject {
 	}
 
 	protected override void Refresh() {
-		if (_mainSR != null) _mainSR.color = SpriteLibrary.GetTileColor(_exitDef.color);
+		if (_colorMarkerSR != null) {
+			if (_exitDef.color == TileColor.None) {
+				_colorMarkerSR.enabled = false;
+			} else {
+				_colorMarkerSR.enabled = true;
+				_colorMarkerSR.color = SpriteLibrary.GetTileColor(_exitDef.color);
+			}
+		}
 	}
 }
 

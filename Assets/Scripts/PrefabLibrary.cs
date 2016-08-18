@@ -55,7 +55,7 @@ public class PrefabLibrary : Library<PrefabLibrary> {
 	void OnValidate() {
 		if (prefabDir != null) {
 			//tilePrefab, tileObjectPrefabs
-			tilePrefab = EditorHelper.GetFirstDirectoryAsset<Tile>(prefabDir);
+			if (tilePrefab == null) tilePrefab = EditorHelper.GetFirstDirectoryAsset<Tile>(prefabDir);
 
 			tileObjectPrefabs.Clear();
 			foreach (var to in EditorHelper.GetDirectoryAssets<TileObject>(prefabDir, true)) {

@@ -7,13 +7,14 @@ public class Game : Controller<Game> {
 
 	public enum State { Disabled, Normal, Animating}
 
-	#region Variables
-	[SerializeField] GameObject playerObj;
+	#region Fields
+	[SerializeField] private Slug slugPrefab;
 
 	[SerializeField] [ReadOnly] private State state;
-	
-	private Vec2i playerPos;
-	private TileColor currPlayerColor;
+
+
+
+	private List<Slug> slugList = new List<Slug>();
 
 	private int currLevelIdx;
 	private Level currLvl;
@@ -25,7 +26,7 @@ public class Game : Controller<Game> {
 	public int Turn{
 		get{ return turn; }
 	}
-	#endregion Variables
+	#endregion Fields
 
 
 	void Update(){
@@ -35,16 +36,23 @@ public class Game : Controller<Game> {
 		if (dir != HexDirection.None) TryMovePlayer(dir);
 	}
 
-	private void ColorPlayer(TileColor color) {
-		currPlayerColor = color;
-		playerObj.GetComponent<SpriteRenderer>().color = SpriteLibrary.GetTileColor(currPlayerColor);
-	}
 
 	private void StartLevel() {
-		Vec2i startPos = currLvl.GetStartPos();
-		playerPos = startPos;
-		ColorPlayer(TileColor.None);
-		playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(startPos) + currLvl.transform.position;
+
+		//Cleanup
+		foreach (var item in slugList) {
+			if (item != null) Destroy(item.gameObject);
+		}
+		slugList.Clear();
+
+		//Spawn slug(s)
+		List<Entrance> entranceList = currLvl.GetEntranceList();
+		foreach (var ent in entranceList) {
+			var slug = Instantiate<Slug>(slugPrefab);
+			slug.SetPosition(ent.ToDef.pos);
+			slug.SetColor(((EntranceDefinition)ent.ToDef).color);
+			slugList.Add(slug);
+		}
 
 		currLvl.InitTileObjects();
 
@@ -67,18 +75,26 @@ public class Game : Controller<Game> {
 	#endregion Level Managing
 
 
-	private void TryMovePlayer(HexDirection dir) {
-		Vec2i endPos = GameHelper.PositionFromDirection(playerPos, dir);
-		Log("TryMovePlayer - dir: " + dir + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
 
-		if (IsWalkable(endPos)){
-			ExecuteMove(playerPos, dir);
+
+	private void TryMovePlayer(HexDirection dir) {
+		foreach (var slug in slugList) {
+			slug.isOnExit = false;
+			Vec2i endPos = GameHelper.PositionFromDirection(slug.pos, dir);
+			Log("TryMovePlayer - dir: " + dir + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
+			if (IsWalkable(slug, endPos)){
+				ExecuteMove(slug, dir);
+			}
 		}
+
 	}
 
-	private bool IsWalkable(Vec2i pos) {
+	private bool IsWalkable(Slug slug, Vec2i pos) {
+		foreach (var item in slugList) {
+			if (item != slug && item.pos == pos) return false;
+		}
 		if (currLvl.IsWalkable(pos, turn)) {
-			if (GameRules.CantMoveOverOtherColors && currLvl.GetTileType(pos) != TileType.Bucket && currLvl.GetTileColorType(pos) != TileColor.None && currPlayerColor != currLvl.GetTileColorType(pos)) {
+			if (GameRules.CantMoveOverOtherColors && currLvl.GetTileType(pos) != TileType.Bucket && currLvl.GetTileColorType(pos) != TileColor.None && slug.color != currLvl.GetTileColorType(pos)) {
 				return false;
 			}
 			return true;
@@ -86,41 +102,37 @@ public class Game : Controller<Game> {
 		return false;
 	}
 
-	private void ExecuteMove(Vec2i startPos, HexDirection dir) {
-		Vec2i endPos = GameHelper.PositionFromDirection(startPos, dir);
+	private void ExecuteMove(Slug slug, HexDirection dir) {
+		Vec2i startPos = slug.pos;
+		Vec2i endPos = GameHelper.PositionFromDirection(slug.pos, dir);
 		Log("Move - endPos: " + endPos + ", endPos tile: " + currLvl.GetTileType(endPos));
-
-		//Set Player position, interact with end tile
-		//playerPos = endPos;
-		//playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(endPos) + currLvl.transform.position;
-
 
 
 		//Animate move
-		StartCoroutine(_MovePlayer(endPos, () => {
+		StartCoroutine(_MovePlayer(slug, endPos, () => {
 			// interact with end tile
 			if (GameRules.PaintBehindPlayer) {
-				PlayerTileInteraction(startPos);
+				SlugTileInteraction(slug, startPos);
 			} else {
-				PlayerTileInteraction(endPos);
+				SlugTileInteraction(slug, endPos);
 			}
 
 			//Check for sliding
 			bool sliding = false;
 			if (GameRules.NormalTilesCausesSlide) {
-				Vec2i newEndPos = GameHelper.PositionFromDirection(playerPos, dir);
-				if (IsWalkable(newEndPos)) {
+				Vec2i newEndPos = GameHelper.PositionFromDirection(slug.pos, dir);
+				if (IsWalkable(slug, newEndPos)) {
 					sliding = true;
 				}
 			}
 
 			//Check for interaction between player and tileObjects
-			if (PlayerTOInteraction(endPos, sliding)) return;
+			if (PlayerTOInteraction(slug, endPos, sliding)) return;
 
 			//Slide!
 			if (sliding) {
 				if (GameRules.TurnsCountWhenSliding) turn++;
-				ExecuteMove(playerPos, dir);
+				ExecuteMove(slug, dir);
 				return;
 			}
 
@@ -133,11 +145,7 @@ public class Game : Controller<Game> {
 
 	}
 
-
-
-
-
-	private void PlayerTileInteraction(Vec2i pos) {
+	private void SlugTileInteraction(Slug slug, Vec2i pos) {
 		TileType tileTyp = currLvl.GetTileType(pos);
 		//if (tileTyp == TileType.Bucket) {
 		//	ColorPlayer(currLvl.GetTileColorType(pos));
@@ -149,8 +157,8 @@ public class Game : Controller<Game> {
 		//	}
 		//}
 
-		if (currPlayerColor != TileColor.None) {  //Paint tile, if not already painted OR if dry - with player color
-			if (tileTyp != TileType.Bucket || GameRules.PaintBucketTiles) currLvl.PaintTile(pos, currPlayerColor, turn);
+		if (slug.color != TileColor.None) {  //Paint tile, if not already painted OR if dry - with player color
+			if (tileTyp != TileType.Bucket || GameRules.PaintBucketTiles) currLvl.PaintTile(pos, slug.color, turn);
 		}
 
 		//if (tileTyp == TileType.Goal && currLvl.CheckForWin()) {
@@ -160,7 +168,7 @@ public class Game : Controller<Game> {
 		//return false;
 	}
 
-	private bool PlayerTOInteraction(Vec2i pos, bool sliding) {
+	private bool PlayerTOInteraction(Slug slug, Vec2i pos, bool sliding) {
 		foreach (var to in currLvl.Map.GetTOAtPos(pos)) {
 			var result = to.PlayerEntered();
 			Debug.Log("PlayerTOInteraction - sliding: " + sliding + ", result.type: "+ result.type);
@@ -180,14 +188,23 @@ public class Game : Controller<Game> {
 				//if (PlayerTileInteraction()) return true;
 				break;
 			case TileObjectInteractionResultType.PickupColor:
-				ColorPlayer(result.color);
+				slug.SetColor(result.color);
 				currLvl.Map.DeleteTOAtPos(pos, to);
 				break;
 			case TileObjectInteractionResultType.Exit:
 				if (!sliding) {
-					if (((ExitDefinition)to.ToDef).color == TileColor.None || ((ExitDefinition)to.ToDef).color == currPlayerColor) {
-						WinLevel();
-						return true;
+					if (((ExitDefinition)to.ToDef).color == TileColor.None || ((ExitDefinition)to.ToDef).color == slug.color) {
+						slug.isOnExit = true;
+						bool allSlugsOnExit = true;
+						foreach (var item in slugList) {
+							if (!item.isOnExit) {
+								allSlugsOnExit = false;
+							}
+						}
+						if (allSlugsOnExit) {
+							WinLevel();
+							return true;
+						}
 					}
 				}
 				break;
@@ -240,19 +257,18 @@ public class Game : Controller<Game> {
 
 
 	#region Coroutines
-	private IEnumerator _MovePlayer(Vec2i endPos, System.Action callback) {
+	private IEnumerator _MovePlayer(Slug slug, Vec2i endPos, System.Action callback) {
 
-		Vector2 startWPos = GameHelper.TileToWorldPos(playerPos) + (Vector2)currLvl.transform.position;
+		Vector2 startWPos = GameHelper.TileToWorldPos(slug.pos) + (Vector2)currLvl.transform.position;
 		Vector2 endWPos = GameHelper.TileToWorldPos(endPos) + (Vector2)currLvl.transform.position;
 		float duration = GameRules.AnimDurationPrTile * (Vector2.Distance(startWPos, endWPos) / Mathf.Sqrt(3f)); 
 		float endTime = Time.time + duration;
 		while (Time.time < endTime) {
 			float t = 1 - (endTime - Time.time) / duration; 
-			playerObj.transform.position = startWPos +  (endWPos - startWPos) * t;
+			slug.transform.position = startWPos +  (endWPos - startWPos) * t;
 			yield return null;
 		}
-		playerPos = endPos;
-		playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(endPos) + currLvl.transform.position;
+		slug.SetPosition(endPos);
 
 		callback();
 	}

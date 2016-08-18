@@ -3645,6 +3645,7 @@ MonoBehaviour:
       x: 1
       y: 2
     className: Entrance
+    color: 0
 --- !u!114 &11444556
 MonoBehaviour:
   m_ObjectHideFlags: 1

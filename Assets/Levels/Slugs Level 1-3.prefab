@@ -1235,6 +1235,7 @@ MonoBehaviour:
       x: 3
       y: 2
     className: Entrance, Assembly-CSharp
+    color: 0
 --- !u!114 &114000013894541180
 MonoBehaviour:
   m_ObjectHideFlags: 1

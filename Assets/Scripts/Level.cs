@@ -49,9 +49,8 @@ public class Level : ProBehaviour {
 	#endregion Loading/Unloading
 
 	#region TileMap Wrappers
-	public Vec2i GetStartPos(){
-		//return tileMap.GetTileOfType(TileType.Start).Pos;
-		return tileMap.GetTOOfType<Entrance>().ToDef.pos;
+	public List<Entrance> GetEntranceList(){
+		return tileMap.GetAllTOOfType<Entrance>();
 	}
 	public Vector2 GetCenterPos() {
 		Vector4 extremes = new Vector4(float.MaxValue, float.MinValue, float.MaxValue, float.MinValue); //min x, max x, min y, max y
