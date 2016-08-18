@@ -98,8 +98,6 @@ public class Game : Controller<Game> {
 
 		//Animate move
 		StartCoroutine(_MovePlayer(endPos, () => {
-			currLvl.UpdateTileObjects(); //Update TileObjects
-
 			// interact with end tile
 			if (GameRules.PaintBehindPlayer) {
 				PlayerTileInteraction(startPos);
@@ -128,6 +126,7 @@ public class Game : Controller<Game> {
 
 			//Go to next turn
 			turn++;
+			currLvl.UpdateTileObjects(); //Update TileObjects
 
 			GameUI.I.SetTurnsText(turn);
 		}));
@@ -212,7 +211,8 @@ public class Game : Controller<Game> {
 		GameUI.I.SetWinText(false);
 
 		CRManager.CallAfterTime(2f, () => {
-			GoTomMenu();
+			//GoTomMenu();
+			RetryLevel();
 		});
 	}
 	private void WinLevel() {
