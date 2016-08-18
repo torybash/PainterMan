@@ -478,10 +478,10 @@ public class LevelEditor : Editor {
 	private void PaintTile() {
 		Undo.RegisterFullObjectHierarchyUndo(Lvl, "Painted tile");
 		Vec2i tilePos = GameHelper.WorldToTilePos(GetMouseWorldPos() - (Vector2)Lvl.transform.position);
-		//Debug.Log("[Level] PaintTile - tilePos: " + tilePos);
+		//Debug.Log("[Level] PaintTile - tilePos: " + tilePos +", GetMouseWorldPos(): "+ GetMouseWorldPos());
 		//if (Lvl.tileType != TileType.Empty) {
-			//TileDefinition tileDef = new TileDefinition { type = Lvl.tileType, goalColor = Lvl.tileGoalColor, color = (Lvl.tileType == TileType.Bucket ? Lvl.tileGoalColor : Lvl.tileColor), pos = tilePos };
-			TileDefinition tileDef = new TileDefinition { type = TileType.Normal, goalColor = TileColor.None, color = TileColor.None, pos = tilePos };
+		//TileDefinition tileDef = new TileDefinition { type = Lvl.tileType, goalColor = Lvl.tileGoalColor, color = (Lvl.tileType == TileType.Bucket ? Lvl.tileGoalColor : Lvl.tileColor), pos = tilePos };
+		TileDefinition tileDef = new TileDefinition { type = TileType.Normal, goalColor = TileColor.None, color = TileColor.None, pos = tilePos };
 			if (Lvl.Map.IsValidTile(tilePos)) {
 				Undo.RecordObject(Lvl.Map.GetTile(tilePos), "Painted tile");
 				Lvl.Map.SetTile(tilePos, tileDef);
@@ -536,9 +536,15 @@ public class LevelEditor : Editor {
 	}
 
 	private Vector2 GetMouseWorldPos() {
-		Vector2 mousePos = Event.current.mousePosition;
-        mousePos.y = Camera.current.pixelHeight - mousePos.y;
-        return Camera.current.ScreenPointToRay(mousePos).origin;
+		//Debug.Log("Camera.current: " + Camera.current + ", pos: "+ Camera.current.transform.position + ", Event.current.mousePosition: "+ Event.current.mousePosition);
+		//Vector2 mousePos = Event.current.mousePosition;
+  //      mousePos.y = Camera.current.pixelHeight - mousePos.y;
+  //      return Camera.current.ScreenPointToRay(mousePos).origin;
+
+		Vector3 mousePosition = Event.current.mousePosition;
+		mousePosition.y = SceneView.currentDrawingSceneView.camera.pixelHeight - mousePosition.y;
+		mousePosition = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(mousePosition);
+		return mousePosition;
 	}
 
 
