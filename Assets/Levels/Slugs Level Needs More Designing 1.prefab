@@ -1008,6 +1008,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainSR: {fileID: 212000013715908636}
+  _colorMarkerSR: {fileID: 0}
   _entranceDef:
     pos:
       x: 1
@@ -1110,6 +1111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainSR: {fileID: 212000013445968376}
+  _colorMarkerSR: {fileID: 0}
   _exitDef:
     pos:
       x: 1

@@ -47,7 +47,7 @@ MonoBehaviour:
   paintNeedsToBeDry: 0
   paintBucketTiles: 1
   normalTilesCausesSlide: 1
-  paintBehindPlayer: 0
+  paintBehindPlayer: 1
   colorDefinitions:
     defList:
     - clr: 1
