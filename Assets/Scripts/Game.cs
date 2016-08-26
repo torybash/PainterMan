@@ -26,8 +26,13 @@ public class Game : Controller<Game> {
 	public int Turn{
 		get{ return turn; }
 	}
+
+	int animCount = 0;
 	#endregion Fields
 
+	public bool IsAnimating() {
+		return animCount > 0;
+	}
 
 	void Update(){
 		if (state != State.Normal) return;
@@ -58,6 +63,7 @@ public class Game : Controller<Game> {
 
 		state = State.Normal;
 		turn = 0;
+		animCount = 0;
 	}
 
 	#region Level Managing
@@ -79,10 +85,11 @@ public class Game : Controller<Game> {
 
 	private void TryMovePlayer(HexDirection dir) {
 		foreach (var slug in slugList) {
-			slug.isOnExit = false;
 			Vec2i endPos = GameHelper.PositionFromDirection(slug.pos, dir);
 			Log("TryMovePlayer - dir: " + dir + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
 			if (IsWalkable(slug, endPos)){
+				slug.isOnExit = false;
+				animCount++;
 				ExecuteMove(slug, dir);
 			}
 		}
@@ -101,6 +108,8 @@ public class Game : Controller<Game> {
 		}
 		return false;
 	}
+
+	
 
 	private void ExecuteMove(Slug slug, HexDirection dir) {
 		Vec2i startPos = slug.pos;
@@ -137,10 +146,14 @@ public class Game : Controller<Game> {
 			}
 
 			//Go to next turn
-			turn++;
-			currLvl.UpdateTileObjects(); //Update TileObjects
+			animCount--;
+			if (animCount < 0) Debug.LogError("animCount < 0! - animCount: " + animCount);
+			if (animCount == 0) {
+				turn++;
+				currLvl.UpdateTileObjects(); //Update TileObjects
 
-			GameUI.I.SetTurnsText(turn);
+				GameUI.I.SetTurnsText(turn);
+			}
 		}));
 
 	}
@@ -193,6 +206,7 @@ public class Game : Controller<Game> {
 				break;
 			case TileObjectInteractionResultType.Exit:
 				if (!sliding) {
+					Log("Slug on exit - exit color: " + ((ExitDefinition)to.ToDef).color + ", slug color: " + slug.color);
 					if (((ExitDefinition)to.ToDef).color == TileColor.None || ((ExitDefinition)to.ToDef).color == slug.color) {
 						slug.isOnExit = true;
 						bool allSlugsOnExit = true;

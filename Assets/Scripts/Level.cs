@@ -446,17 +446,21 @@ public class LevelEditor : Editor {
 			((PaintBucketDefinition)Lvl.tileObjectDefinition).color = color;
 		}else if (Lvl.tileObjectPrefab.GetType() == typeof(Exit) ) {
 			((ExitDefinition)Lvl.tileObjectDefinition).color = color;
+		}else if (Lvl.tileObjectPrefab.GetType() == typeof(Entrance) ) {
+			((EntranceDefinition)Lvl.tileObjectDefinition).color = color;
 		}
 	}
 
 	private void ChangeColor(int change) {
-		if (Lvl.tileObjectPrefab.GetType() != typeof(PaintBucket) && Lvl.tileObjectPrefab.GetType() != typeof(Exit)) return;
+		if (Lvl.tileObjectPrefab.GetType() != typeof(PaintBucket) && Lvl.tileObjectPrefab.GetType() != typeof(Exit)  && Lvl.tileObjectPrefab.GetType() != typeof(Entrance)) return;
 
 		TileColor oldCol = TileColor.None;
 		if (Lvl.tileObjectPrefab.GetType() == typeof(PaintBucket)) {
 			oldCol = ((PaintBucketDefinition)Lvl.tileObjectDefinition).color;
 		} else if (Lvl.tileObjectPrefab.GetType() == typeof(Exit)) {
 			oldCol = ((ExitDefinition)Lvl.tileObjectDefinition).color;
+		} else if (Lvl.tileObjectPrefab.GetType() == typeof(Entrance)) {
+			oldCol = ((EntranceDefinition)Lvl.tileObjectDefinition).color;
 		}
 		TileColor newCol = (TileColor)((((int)oldCol) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
 		if (change == 1) newCol = (TileColor)((((int)oldCol) + 1) % System.Enum.GetValues(typeof(TileColor)).Length);
