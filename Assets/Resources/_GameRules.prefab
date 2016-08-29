@@ -48,6 +48,8 @@ MonoBehaviour:
   paintBucketTiles: 1
   normalTilesCausesSlide: 1
   paintBehindPlayer: 1
+  updateSpikesBeforeMove: 0
+  removeSlugsWhenTouchExit: 1
   colorDefinitions:
     defList:
     - clr: 1

@@ -45,8 +45,8 @@ public class Game : Controller<Game> {
 	private void StartLevel() {
 
 		//Cleanup
-		foreach (var item in slugList) {
-			if (item != null) Destroy(item.gameObject);
+		foreach (var slug in slugList) {
+			if (slug != null) Destroy(slug.gameObject);
 		}
 		slugList.Clear();
 
@@ -84,6 +84,7 @@ public class Game : Controller<Game> {
 
 
 	private void TryMovePlayer(HexDirection dir) {
+		bool moved = false;
 		foreach (var slug in slugList) {
 			Vec2i endPos = GameHelper.PositionFromDirection(slug.pos, dir);
 			Log("TryMovePlayer - dir: " + dir + ", currLevel.IsValidTile(endPos): "+ currLvl.IsValidTile(endPos));
@@ -92,8 +93,12 @@ public class Game : Controller<Game> {
 				animCount++;
 				ExecuteMove(slug, dir);
 			}
+			moved = true;
 		}
 
+		if (moved) {
+			if (GameRules.UpdateSpikesBeforeMove) currLvl.UpdateTileObjects(); //Update TileObjects
+		}
 	}
 
 	private bool IsWalkable(Slug slug, Vec2i pos) {
@@ -118,7 +123,7 @@ public class Game : Controller<Game> {
 
 
 		//Animate move
-		StartCoroutine(_MovePlayer(slug, endPos, () => {
+		StartCoroutine(_MoveSlug(slug, endPos, () => {
 			// interact with end tile
 			if (GameRules.PaintBehindPlayer) {
 				SlugTileInteraction(slug, startPos);
@@ -136,7 +141,7 @@ public class Game : Controller<Game> {
 			}
 
 			//Check for interaction between player and tileObjects
-			if (PlayerTOInteraction(slug, endPos, sliding)) return;
+			if (SlugTOInteraction(slug, endPos, sliding)) return;
 
 			//Slide!
 			if (sliding) {
@@ -149,13 +154,20 @@ public class Game : Controller<Game> {
 			animCount--;
 			if (animCount < 0) Debug.LogError("animCount < 0! - animCount: " + animCount);
 			if (animCount == 0) {
-				turn++;
-				currLvl.UpdateTileObjects(); //Update TileObjects
-
-				GameUI.I.SetTurnsText(turn);
+				EndTurn();
 			}
 		}));
+	}
 
+	private void EndTurn() {
+		foreach (var slug in slugList) {
+			SlugTOInteraction(slug, slug.pos, false);
+		}
+
+		if (!GameRules.UpdateSpikesBeforeMove) currLvl.UpdateTileObjects(); //Update TileObjects
+
+		turn++;
+		GameUI.I.SetTurnsText(turn);
 	}
 
 	private void SlugTileInteraction(Slug slug, Vec2i pos) {
@@ -181,7 +193,7 @@ public class Game : Controller<Game> {
 		//return false;
 	}
 
-	private bool PlayerTOInteraction(Slug slug, Vec2i pos, bool sliding) {
+	private bool SlugTOInteraction(Slug slug, Vec2i pos, bool sliding) {
 		foreach (var to in currLvl.Map.GetTOAtPos(pos)) {
 			var result = to.PlayerEntered();
 			Debug.Log("PlayerTOInteraction - sliding: " + sliding + ", result.type: "+ result.type);
@@ -209,9 +221,15 @@ public class Game : Controller<Game> {
 					Log("Slug on exit - exit color: " + ((ExitDefinition)to.ToDef).color + ", slug color: " + slug.color);
 					if (((ExitDefinition)to.ToDef).color == TileColor.None || ((ExitDefinition)to.ToDef).color == slug.color) {
 						slug.isOnExit = true;
+
+						if (GameRules.RemoveSlugsWhenTouchExit) {
+							slugList.Remove(slug);
+							Destroy(slug.gameObject);
+						}
+
 						bool allSlugsOnExit = true;
-						foreach (var item in slugList) {
-							if (!item.isOnExit) {
+						foreach (var otherSlug in slugList) {
+							if (!otherSlug.isOnExit) {
 								allSlugsOnExit = false;
 							}
 						}
@@ -271,7 +289,7 @@ public class Game : Controller<Game> {
 
 
 	#region Coroutines
-	private IEnumerator _MovePlayer(Slug slug, Vec2i endPos, System.Action callback) {
+	private IEnumerator _MoveSlug(Slug slug, Vec2i endPos, System.Action callback) {
 
 		Vector2 startWPos = GameHelper.TileToWorldPos(slug.pos) + (Vector2)currLvl.transform.position;
 		Vector2 endWPos = GameHelper.TileToWorldPos(endPos) + (Vector2)currLvl.transform.position;

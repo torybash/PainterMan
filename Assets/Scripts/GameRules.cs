@@ -34,6 +34,11 @@ public class GameRules : Library<GameRules> {
 	[SerializeField] bool paintBehindPlayer;
 	public static bool PaintBehindPlayer { get { return I.paintBehindPlayer; } }
 
+	[SerializeField] bool updateSpikesBeforeMove;
+	public static bool UpdateSpikesBeforeMove { get { return I.updateSpikesBeforeMove; } }
+	[SerializeField] bool removeSlugsWhenTouchExit;
+	public static bool RemoveSlugsWhenTouchExit { get { return I.removeSlugsWhenTouchExit; } }
+
 
 	[Header("Defintion of colors")]
 	[SerializeField] private ColorDefinitions colorDefinitions;
