@@ -64,7 +64,7 @@ MonoBehaviour:
       timeToDry: 2
     - clr: 6
       timeToDry: 3
-  animDurationPrTile: 0.2
+  animDurationPrTile: 3.18
   paintGradient: 1
 --- !u!1001 &100100000
 Prefab:

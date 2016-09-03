@@ -28,19 +28,26 @@ public class Game : Controller<Game> {
 	}
 
 	int animCount = 0;
+
+	TrailSystem trailSys;
 	#endregion Fields
+
+
+	#region Lifetime	
+	void Awake() {
+		trailSys = new TrailSystem();
+	}
+	void Update(){
+		if (state != State.Normal) return;
+		HexDirection dir = InputManager.I.InputUpdate();
+		if (dir != HexDirection.None) TryMovePlayer(dir);
+	}
+	#endregion Lifetime
+
 
 	public bool IsAnimating() {
 		return animCount > 0;
 	}
-
-	void Update(){
-		if (state != State.Normal) return;
-		HexDirection dir = InputManager.I.InputUpdate();
-
-		if (dir != HexDirection.None) TryMovePlayer(dir);
-	}
-
 
 	private void StartLevel() {
 
@@ -290,14 +297,17 @@ public class Game : Controller<Game> {
 
 	#region Coroutines
 	private IEnumerator _MoveSlug(Slug slug, Vec2i endPos, System.Action callback) {
-
 		Vector2 startWPos = GameHelper.TileToWorldPos(slug.pos) + (Vector2)currLvl.transform.position;
 		Vector2 endWPos = GameHelper.TileToWorldPos(endPos) + (Vector2)currLvl.transform.position;
+
+		var trail = trailSys.CreateTrail(startWPos, endWPos);
+
 		float duration = GameRules.AnimDurationPrTile * (Vector2.Distance(startWPos, endWPos) / Mathf.Sqrt(3f)); 
 		float endTime = Time.time + duration;
 		while (Time.time < endTime) {
 			float t = 1 - (endTime - Time.time) / duration; 
 			slug.transform.position = startWPos +  (endWPos - startWPos) * t;
+			trail.SetVisible(1-t);
 			yield return null;
 		}
 		slug.SetPosition(endPos);

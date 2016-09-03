@@ -41,6 +41,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 11434912, guid: dccc28fe437ad41309e465af4ebc9b7e, type: 2}
+  trailPrefab: {fileID: 114000012677557584, guid: 27691b19eb928274e984ffdcd0507976,
+    type: 2}
   tileObjectPrefabs:
   - {fileID: 11467896, guid: 5c28234bb8b242046b4539d92c6407df, type: 2}
   - {fileID: 11418732, guid: 73e6ac2cbd2af3942af98d9fa809d739, type: 2}

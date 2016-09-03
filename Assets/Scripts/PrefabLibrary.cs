@@ -9,11 +9,15 @@ using Object = UnityEngine.Object;
 public class PrefabLibrary : Library<PrefabLibrary> {
 
 	[SerializeField] Tile tilePrefab;
+	[SerializeField] Trail trailPrefab;
 	[SerializeField] List<TileObject> tileObjectPrefabs;
 	public List<TileObject> TileObjectPrefabs { get { return tileObjectPrefabs; } }
 
 	public Tile GetTileInstance() {
 		return InstantiatePrefab<Tile>(tilePrefab) ;
+	}
+	public Trail GetTrailInstance() {
+		return InstantiatePrefab<Trail>(trailPrefab) ;
 	}
 
 	public TileObject GetTileObject<T>(T to) where T : TileObject {
