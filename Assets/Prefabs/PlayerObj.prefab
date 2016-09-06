@@ -86,7 +86,7 @@ MonoBehaviour:
     y: 0
   color: 0
   isOnExit: 0
-  sr: {fileID: 0}
+  sr: {fileID: 212000013961461706}
 --- !u!212 &212000013961461706
 SpriteRenderer:
   m_ObjectHideFlags: 1

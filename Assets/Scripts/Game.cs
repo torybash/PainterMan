@@ -56,6 +56,7 @@ public class Game : Controller<Game> {
 			if (slug != null) Destroy(slug.gameObject);
 		}
 		slugList.Clear();
+		trailSys.Init();
 
 		//Spawn slug(s)
 		List<Entrance> entranceList = currLvl.GetEntranceList();
@@ -104,8 +105,13 @@ public class Game : Controller<Game> {
 		}
 
 		if (moved) {
-			if (GameRules.UpdateSpikesBeforeMove) currLvl.UpdateTileObjects(); //Update TileObjects
+			if (GameRules.UpdateSpikesBeforeMove) TurnEnded();
 		}
+	}
+
+	private void TurnEnded() {
+		trailSys.UpdateTrails();
+		currLvl.UpdateTileObjects(); //Update TileObjects
 	}
 
 	private bool IsWalkable(Slug slug, Vec2i pos) {
@@ -171,7 +177,7 @@ public class Game : Controller<Game> {
 			SlugTOInteraction(slug, slug.pos, false);
 		}
 
-		if (!GameRules.UpdateSpikesBeforeMove) currLvl.UpdateTileObjects(); //Update TileObjects
+		if (!GameRules.UpdateSpikesBeforeMove) TurnEnded();
 
 		turn++;
 		GameUI.I.SetTurnsText(turn);
@@ -297,22 +303,21 @@ public class Game : Controller<Game> {
 
 	#region Coroutines
 	private IEnumerator _MoveSlug(Slug slug, Vec2i endPos, System.Action callback) {
+		var trail = trailSys.CreateTrail(slug.pos, endPos, slug.color, turn);
+
 		Vector2 startWPos = GameHelper.TileToWorldPos(slug.pos) + (Vector2)currLvl.transform.position;
 		Vector2 endWPos = GameHelper.TileToWorldPos(endPos) + (Vector2)currLvl.transform.position;
-
 		slug.transform.rotation = GameHelper.GetRotationFromVector(endWPos - startWPos);
-
-		var trail = trailSys.CreateTrail(startWPos, endWPos, slug.color);
-
 		float duration = GameRules.AnimDurationPrTile * (Vector2.Distance(startWPos, endWPos) / Mathf.Sqrt(3f)); 
 		float endTime = Time.time + duration;
 		while (Time.time < endTime) {
 			float t = 1 - (endTime - Time.time) / duration; 
 			slug.transform.position = startWPos +  (endWPos - startWPos) * t;
-			trail.SetVisible(1-t);
+			if (trail) trail.SetVisible(1-t);
 			yield return null;
 		}
 		slug.SetPosition(endPos);
+		if (trail) trail.SetVisible(0);
 
 		callback();
 	}
