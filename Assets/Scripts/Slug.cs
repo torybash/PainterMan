@@ -8,8 +8,7 @@ public class Slug : MonoBehaviour {
 	public bool isOnExit;
 
 
-	private SpriteRenderer sr;
-	private SpriteRenderer Sr { get { if (sr == null) sr = GetComponent<SpriteRenderer>(); return sr; } }
+	[SerializeField] SpriteRenderer sr;
 
 	
 
@@ -20,6 +19,6 @@ public class Slug : MonoBehaviour {
 
 	public void SetColor(TileColor color) {
 		this.color = color;
-		Sr.color = SpriteLibrary.GetTileColor(color);
+		sr.color = SpriteLibrary.GetTileColor(color);
 	}
 }

@@ -86,7 +86,7 @@
 
 				if (_Scroll > IN.texcoord.x + 0.1) c.rgba = 0;
 				else if (_Scroll <= IN.texcoord.x + 0.1 && _Scroll > IN.texcoord.x) c.rgba = 1 - abs(IN.texcoord.x - _Scroll) * 10;
-				else c.rgba = 1;
+				else c.rgba = 1 * _Color;
 				//if (_Scroll > IN.texcoord.x) c.rgba = 0;
 				return c;
 			}

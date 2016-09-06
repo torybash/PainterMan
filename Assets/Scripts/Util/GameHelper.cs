@@ -3,9 +3,8 @@ using System.Collections;
 
 public class GameHelper {
 
-
+	#region TilePosition<-->WorldPosition
 	public static Vector2 TileToWorldPos(Vec2i pos){
-		//float xPos = Mathf.Sqrt(3f) * pos.x + (Mathf.Abs(pos.y % 2) == 1 ? Mathf.Sign(pos.y) * Mathf.Sqrt(3f)/2f : 0);
 		float xPos = Mathf.Sqrt(3f) * pos.x + (Mathf.Abs(pos.y % 2) == 1 ? Mathf.Sqrt(3f)/2f : 0);
 		float yPos = 1.5f * pos.y;
 		return new Vector2(xPos, yPos);
@@ -13,15 +12,19 @@ public class GameHelper {
 
 	public static Vec2i WorldToTilePos(Vector2 pos) {
 		int yPos = Mathf.RoundToInt(pos.y / 1.5f);
-		//int xPos = Mathf.RoundToInt(pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0));
 		int xPos = Mathf.RoundToInt(pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? 1f * 0.5f : 0));
-
-		//Debug.Log("WorldToTilePos - pos: " + pos + " , (yPos % 2 == 1 ? Mathf.Sign(yPos) * 0.5f : 0): " + (pos.x / Mathf.Sqrt(3f) - (Mathf.Abs(yPos % 2) == 1 ? Mathf.Sign(yPos) * 0.5f : 0)) + ", xpos: " + xPos + " ypos: " + yPos);
-		//float xPos = Mathf.Sqrt(3f) * pos.x + (pos.y % 2 == 1 ? Mathf.Sqrt(3f) / 2f : 0);
-		//Mathf.Sqrt(3f) * pos.x --> xPos - (pos.y % 2 == 1 ? Mathf.Sqrt(3f) / 2f : 0)
-		//float yPos = 1.5f * pos.y;
 		return new Vec2i(xPos, yPos);
 	}
+	#endregion TilePosition<-->WorldPosition
+
+
+	#region Rotation
+	public static Quaternion GetRotationFromVector(Vector2 vec) {
+		float angle = Mathf.Atan2(vec.y, vec.x) * Mathf.Rad2Deg;
+		return Quaternion.AngleAxis(angle, Vector3.forward);
+	}
+	#endregion
+
 
 	public static Vec2i PositionFromDirection(Vec2i pos, HexDirection dir) {
 		bool evenYPos = pos.y % 2 == 0;
@@ -53,14 +56,6 @@ public class GameHelper {
 		return endPos;
 	}
 
-		//	if (Input.GetKeyDown(KeyCode.M)){
-		//	xMove = (evenYPos ? 0 : 1);
-		//	yMove = -1;
-		//}else
-		//if (Input.GetKeyDown(KeyCode.N)){
-		//	xMove = (evenYPos ? -1 : 0);
-		//	yMove = -1;
-		//}else
 }
 
 [System.Serializable]

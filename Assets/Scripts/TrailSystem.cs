@@ -13,13 +13,14 @@ public class TrailSystem {
 
 
 
-	public Trail CreateTrail(Vector3 startPos, Vector3 endPos) {
+	public Trail CreateTrail(Vector3 startPos, Vector3 endPos, TileColor tileClr) {
 		var trail = PrefabLibrary.I.GetTrailInstance();
+		trail.Init(tileClr);
+
 		trail.transform.position = (endPos + startPos) / 2f;
-		var diff = endPos - startPos;
-		float angle = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg + 180f;
-		Debug.Log("Diff: " + diff + ", angle: " + angle);
-		trail.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+		trail.transform.rotation = GameHelper.GetRotationFromVector(startPos - endPos ); // Quaternion.AngleAxis(angle, Vector3.forward);
 		return trail;
 	}
+
+
 }

@@ -12,6 +12,11 @@ public class Trail : MonoBehaviour {
 		}
 	}
 
+	public void Init(TileColor tileClr) {
+		//Mat.color = SpriteLibrary.GetTileColor(tileClr);
+		Mat.SetColor("_Color", SpriteLibrary.GetTileColor(tileClr));
+	}
+
 	public void SetVisible(float frac) {
 		Mat.SetFloat("_Scroll", frac);
 	}

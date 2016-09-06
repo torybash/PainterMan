@@ -300,7 +300,9 @@ public class Game : Controller<Game> {
 		Vector2 startWPos = GameHelper.TileToWorldPos(slug.pos) + (Vector2)currLvl.transform.position;
 		Vector2 endWPos = GameHelper.TileToWorldPos(endPos) + (Vector2)currLvl.transform.position;
 
-		var trail = trailSys.CreateTrail(startWPos, endWPos);
+		slug.transform.rotation = GameHelper.GetRotationFromVector(endWPos - startWPos);
+
+		var trail = trailSys.CreateTrail(startWPos, endWPos, slug.color);
 
 		float duration = GameRules.AnimDurationPrTile * (Vector2.Distance(startWPos, endWPos) / Mathf.Sqrt(3f)); 
 		float endTime = Time.time + duration;
