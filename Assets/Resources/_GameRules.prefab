@@ -59,7 +59,7 @@ MonoBehaviour:
     - clr: 3
       timeToDry: 4
     - clr: 4
-      timeToDry: 1
+      timeToDry: 4
     - clr: 5
       timeToDry: 2
     - clr: 6
