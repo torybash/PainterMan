@@ -49,6 +49,7 @@
 			};
 			
 			fixed4 _Color;
+			fixed4 _SecondColor;
 			fixed _Scroll;
 
 			v2f vert(appdata_t IN)
@@ -87,7 +88,10 @@
 				if (_Scroll > IN.texcoord.x + 0.1) c.rgba = 0;
 				else if (_Scroll <= IN.texcoord.x + 0.1 && _Scroll > IN.texcoord.x) c.rgba *= 1 - abs(IN.texcoord.x - _Scroll) * 10;
 				//else c.rgb = 1;
-				c *= _Color;
+				if (IN.texcoord.x > 0.5) c *= _Color;
+				else c *= _SecondColor;
+
+				//c *= _Color;
 				//if (_Scroll > IN.texcoord.x) c.rgba = 0;
 				return c;
 			}

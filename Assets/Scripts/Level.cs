@@ -81,7 +81,7 @@ public class Level : ProBehaviour {
 	}
 	public void PaintTile(Vec2i pos, TileColor tileColor, int turn){
 		if (IsValidTile(pos)){
-			Debug.Log("[Level] PaintTile - pos: "+ pos + ", tileColor: "+ tileColor + ", turn: "+ turn);
+			Log("PaintTile - pos: "+ pos + ", tileColor: "+ tileColor + ", turn: "+ turn);
 			tileMap.GetTile(pos).TileDef.color = tileColor;
 			tileMap.GetTile(pos).TileDef.paintedTurn = turn;
 			tileMap.GetTile(pos).Refresh();
@@ -89,7 +89,7 @@ public class Level : ProBehaviour {
 	}
 
 	public bool IsWalkable(Vec2i pos, int turn){
-		Debug.Log("[Level] IsWalkable - pos: "+ pos + ", turn: "+ turn + ", tile: "+ tileMap.GetTile(pos) + ", is color dry?: "+ IsColorDry(pos, turn));
+		Log("IsWalkable - pos: "+ pos + ", turn: "+ turn + ", tile: "+ tileMap.GetTile(pos) + ", is color dry?: "+ IsColorDry(pos, turn));
 
 		return tileMap.IsValidTile(pos) && (tileMap.GetTile(pos).TileDef.color == TileColor.None || (!GameRules.PaintNeedsToBeDry || IsColorDry(pos, turn)) );
 	}

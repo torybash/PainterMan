@@ -14,15 +14,21 @@ public class Trail : MonoBehaviour {
 
 	private TileColor _tileClr;
 	public TileColor TileClr{ get { return _tileClr; } }
+	private TileColor _secondTileClr;
+	public TileColor SecondTileClr{ get { return _secondTileClr; } }
 	private int _paintedTurn;
 	public int PaintedTurn { get { return _paintedTurn; } }
 
+
 	public void Init(TileColor tileClr, int paintedTurn) {
 		_tileClr = tileClr;
+		_secondTileClr = tileClr;
 		_paintedTurn = paintedTurn;
 
-		Mat.color = SpriteLibrary.GetTileColor(tileClr);
+		//Mat.color = SpriteLibrary.GetTileColor(tileClr);
 		//Mat.SetColor("_Color", SpriteLibrary.GetTileColor(tileClr));
+		//Mat.SetColor("_SecondColor", SpriteLibrary.GetTileColor(tileClr));
+		UpdateColor();
 	}
 
 	public void UpdateColor() {
@@ -39,12 +45,21 @@ public class Trail : MonoBehaviour {
 		Debug.Log("Trail UpdateColor - fracDry: "+ fracDry);
 
 		var col = SpriteLibrary.GetTileColor(_tileClr);
-		//Mat.SetColor("_Color", new Color(col.r * fracDry, col.g * fracDry, col.b * fracDry));
-		Mat.color = new Color(col.r * fracDry, col.g * fracDry, col.b * fracDry);
+		var secCol = SpriteLibrary.GetTileColor(_secondTileClr);
+		Mat.SetColor("_Color", new Color(col.r * fracDry, col.g * fracDry, col.b * fracDry));
+		Mat.SetColor("_SecondColor", new Color(secCol.r * fracDry, secCol.g * fracDry, secCol.b * fracDry));
+		//Mat.color = new Color(col.r * fracDry, col.g * fracDry, col.b * fracDry);
 		//}
 	}
 
+
 	public void SetVisible(float frac) {
 		Mat.SetFloat("_Scroll", frac);
+	}
+
+	public void SetSecondaryColor(TileColor tileClr) {
+		//Debug.Log("SetSecondaryColor - tileClr: " + tileClr);
+		_secondTileClr = tileClr;
+		UpdateColor();
 	}
 }

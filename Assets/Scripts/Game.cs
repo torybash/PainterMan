@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 
 public class Game : Controller<Game> {
@@ -210,7 +211,7 @@ public class Game : Controller<Game> {
 	private bool SlugTOInteraction(Slug slug, Vec2i pos, bool sliding) {
 		foreach (var to in currLvl.Map.GetTOAtPos(pos)) {
 			var result = to.PlayerEntered();
-			Debug.Log("PlayerTOInteraction - sliding: " + sliding + ", result.type: "+ result.type);
+			Log("PlayerTOInteraction - sliding: " + sliding + ", result.type: "+ result.type);
 
 			switch (result.type) {
 			case TileObjectInteractionResultType.Kill:
@@ -311,10 +312,26 @@ public class Game : Controller<Game> {
 		slug.transform.rotation = GameHelper.GetRotationFromVector(endWPos - startWPos);
 		float duration = GameRules.AnimDurationPrTile * (Vector2.Distance(startWPos, endWPos) / Mathf.Sqrt(3f)); 
 		float endTime = Time.time + duration;
+		bool checkedColChange = false;
 		while (Time.time < endTime) {
 			float t = 1 - (endTime - Time.time) / duration; 
 			slug.transform.position = startWPos +  (endWPos - startWPos) * t;
 			if (trail) trail.SetVisible(1-t);
+
+			if (trail != null && !checkedColChange && t > 0.5) {
+				//Log("currLvl.Map.GetTOAtPos(endPos): " + currLvl.Map.GetTOAtPos(endPos));
+				PaintBucket bucket = null;
+				foreach (var item in currLvl.Map.GetTOAtPos(endPos)) {
+					//Log("item: " + item);
+					if (item.GetType() == typeof(PaintBucket)) {
+						bucket = (PaintBucket) item;
+						break;
+					}
+				}
+				//var bucket = currLvl.Map.GetTOAtPos(endPos).First(x => x is PaintBucket);
+				if (bucket != null) trail.SetSecondaryColor(((PaintBucketDefinition)bucket.ToDef).color);
+				checkedColChange = true;
+			}
 			yield return null;
 		}
 		slug.SetPosition(endPos);
