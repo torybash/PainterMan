@@ -23,6 +23,12 @@ public class Entrance : TileObject {
 		Refresh();
 	}
 
+	public override void Init() {
+		base.Init();
+
+		_mainSR.enabled = false;
+	}
+
 	protected override void Refresh() {
 		if (_colorMarkerSR != null) {
 			if (_entranceDef.color == TileColor.None) {

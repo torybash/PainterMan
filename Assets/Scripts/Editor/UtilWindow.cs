@@ -19,6 +19,11 @@ public class UtilWindow : EditorWindow {
         window.Show();
     }
 
+	[MenuItem("Tools/Delete PlayerPrefs %#d", priority = 10)]
+	private static void CallDeletePlayerPrefs() {
+		DeletePlayerPrefs();
+	}
+
     void OnGUI () {
 		scrollPos = EditorGUILayout.BeginScrollView (scrollPos, false, false);
 		GUILayout.Label("Replace GameObject(s)", EditorStyles.boldLabel);
@@ -51,6 +56,15 @@ public class UtilWindow : EditorWindow {
 			}
    		}
 
+
+		GUILayout.Space(25);
+		GUILayout.Label("Player Prefs", EditorStyles.boldLabel);
+		if (GUILayout.Button("Delete ALL PlayerPrefs")) {
+			if (EditorUtility.DisplayDialog("Warning!", 
+				"Are you sure you want to delete ALL PLAYER PREFS?", "Yes", "No")) {
+				DeletePlayerPrefs();
+			}
+		}
 
 		so.ApplyModifiedProperties();
 		EditorGUILayout.EndScrollView();
@@ -136,7 +150,17 @@ public class UtilWindow : EditorWindow {
 	}
 
 
-	 public static Type FindTypeInLoadedAssemblies(string typeName){
+
+
+
+	public static void DeletePlayerPrefs() {
+		PlayerPrefs.DeleteAll();
+	}
+
+
+
+	#region Tools
+		public static Type FindTypeInLoadedAssemblies(string typeName){
 		 Type _type = null;
 		 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
 		 {
@@ -146,4 +170,5 @@ public class UtilWindow : EditorWindow {
 		 }
 		 return _type;
 	 }
+	#endregion
 }

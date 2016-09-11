@@ -100,8 +100,9 @@ public class Game : Controller<Game> {
 				slug.isOnExit = false;
 				animCount++;
 				ExecuteMove(slug, dir);
+
+				moved = true;
 			}
-			moved = true;
 		}
 
 		if (moved) {
@@ -112,6 +113,9 @@ public class Game : Controller<Game> {
 	private void TurnEnded() {
 		trailSys.UpdateTrails();
 		currLvl.UpdateTileObjects(); //Update TileObjects
+
+		turn++;
+		GameUI.I.SetTurnsText(turn);
 	}
 
 	private bool IsWalkable(Slug slug, Vec2i pos) {
@@ -178,9 +182,6 @@ public class Game : Controller<Game> {
 		}
 
 		if (!GameRules.UpdateSpikesBeforeMove) TurnEnded();
-
-		turn++;
-		GameUI.I.SetTurnsText(turn);
 	}
 
 	private void SlugTileInteraction(Slug slug, Vec2i pos) {
