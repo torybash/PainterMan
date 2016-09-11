@@ -38,7 +38,7 @@ public class Game : Controller<Game> {
 		trailSys = new TrailSystem();
 	}
 	void Update(){
-		if (state != State.Normal && animCount > 0) return;
+		if (state != State.Normal || IsAnimating()) return;
 		HexDirection dir = InputManager.I.InputUpdate();
 		if (dir != HexDirection.None) TryMovePlayer(dir);
 	}
