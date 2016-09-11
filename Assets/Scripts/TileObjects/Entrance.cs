@@ -27,6 +27,7 @@ public class Entrance : TileObject {
 		base.Init();
 
 		_mainSR.enabled = false;
+		_colorMarkerSR.enabled = false;
 	}
 
 	protected override void Refresh() {
