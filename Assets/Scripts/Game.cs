@@ -159,7 +159,15 @@ public class Game : Controller<Game> {
 			}
 
 			//Check for interaction between player and tileObjects
-			if (SlugTOInteraction(slug, endPos, sliding)) return;
+			if (SlugTOInteraction(slug, endPos)) return;
+
+			//Check for still sliding
+			if (GameRules.NormalTilesCausesSlide) {
+				Vec2i newEndPos = GameHelper.PositionFromDirection(slug.pos, dir);
+				if (IsWalkable(slug, newEndPos)) {
+					sliding = true;
+				}
+			}
 
 			//Slide!
 			if (sliding) {
@@ -179,7 +187,7 @@ public class Game : Controller<Game> {
 
 	private void EndTurn() {
 		foreach (var slug in slugList) {
-			SlugTOInteraction(slug, slug.pos, false);
+			SlugTOInteraction(slug, slug.pos, false, false);
 		}
 
 		if (!GameRules.UpdateSpikesBeforeMove) TurnEnded();
@@ -208,7 +216,7 @@ public class Game : Controller<Game> {
 		//return false;
 	}
 
-	private bool SlugTOInteraction(Slug slug, Vec2i pos, bool sliding) {
+	private bool SlugTOInteraction(Slug slug, Vec2i pos, bool sliding = true, bool useTeleports = true) {
 		foreach (var to in currLvl.Map.GetTOAtPos(pos)) {
 			var result = to.PlayerEntered();
 			Log("PlayerTOInteraction - sliding: " + sliding + ", result.type: "+ result.type);
@@ -219,10 +227,12 @@ public class Game : Controller<Game> {
 				return true;
 
 			case TileObjectInteractionResultType.Teleport:
-				Debug.LogError("CURRENTLY NOT WORKING - TODO!");
+				//Debug.LogError("CURRENTLY NOT WORKING - TODO!");
 				//Set Player position, interact with end tile
 				//playerPos = result.position;
 				//playerObj.transform.position = (Vector3)GameHelper.TileToWorldPos(result.position) + currLvl.transform.position;
+
+				if (useTeleports) slug.SetPosition(result.pos);
 
 				// interact with end tile
 				//if (PlayerTileInteraction()) return true;

@@ -41,22 +41,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allSpritesList:
+  - name: bucket
+    sprite: {fileID: 21300000, guid: 3174c411de967af48bc08250580bcf80, type: 3}
+  - name: circle
+    sprite: {fileID: 21300000, guid: 17d278db8057a6e4b8a89970ebdecf87, type: 3}
+  - name: cyan_thingy
+    sprite: {fileID: 21300000, guid: 68ed693dbfd40ee47a9002d174d9f583, type: 3}
+  - name: entrance
+    sprite: {fileID: 21300000, guid: a065bf8f9f4e6e24f8d7072458057cfe, type: 3}
+  - name: exit
+    sprite: {fileID: 21300000, guid: a9b1b19cfc7f3514b87af3ea565682c5, type: 3}
+  - name: green_thingy
+    sprite: {fileID: 21300000, guid: 1f0aaae0740531b499f0d6e020d307b5, type: 3}
   - name: guy
     sprite: {fileID: 21300000, guid: 98ceec799ad0d2144950471d2cac7730, type: 3}
   - name: hextile
     sprite: {fileID: 21300000, guid: e86270ac52e6f4687b9f04f00e537011, type: 3}
+  - name: hextile_banana
+    sprite: {fileID: 21300000, guid: 52971b29982bd5542b81346318127a2b, type: 3}
+  - name: hextile_blueberry
+    sprite: {fileID: 21300000, guid: ad773e7431c1a404ca26e1962f873c3a, type: 3}
   - name: hextile_bucket
     sprite: {fileID: 21300000, guid: b5684c9e4f807406985b3f608940294d, type: 3}
   - name: hextile_end
     sprite: {fileID: 21300000, guid: 51215cb3f557e4b9196d07104909118f, type: 3}
+  - name: hextile_raspberry
+    sprite: {fileID: 21300000, guid: 2e8669a6af5890b4baf34bab750684c4, type: 3}
   - name: hextile_start
     sprite: {fileID: 21300000, guid: d12bc78e852584852a1c5be89e13f15a, type: 3}
+  - name: magneta_thingy
+    sprite: {fileID: 21300000, guid: b4cb8a8fba531b24dbcb67c34e70bc21, type: 3}
   - name: to_SpikesDown
     sprite: {fileID: 21300000, guid: 8ce1539a308ebcd429a5eb14bf5d9877, type: 3}
   - name: to_SpikesUp
     sprite: {fileID: 21300000, guid: da4db829e8472464a90fc0b6bf67a1e3, type: 3}
   - name: to_Teleporter
     sprite: {fileID: 21300000, guid: d80a4e2b954148c49a5c3ff23bfd3792, type: 3}
+  - name: trail
+    sprite: {fileID: 21300000, guid: aa35bad47e5af07499b027e7ce6474d3, type: 3}
+  - name: trailtest
+    sprite: {fileID: 21300000, guid: bce394a35de642945a051e982bb65db4, type: 3}
   tileSpriteList:
   - type: 1
     sprite: {fileID: 21300000, guid: e86270ac52e6f4687b9f04f00e537011, type: 3}
@@ -81,6 +105,19 @@ MonoBehaviour:
     color: {r: 0.8014706, g: 0.19447447, b: 0.8014706, a: 1}
   - colorType: 6
     color: {r: 0.9485294, g: 0.9485294, b: 0.21620889, a: 1}
+  bucketSpriteList:
+  - colorType: 1
+    sprite: {fileID: 21300000, guid: 2e8669a6af5890b4baf34bab750684c4, type: 3}
+  - colorType: 2
+    sprite: {fileID: 21300000, guid: 1f0aaae0740531b499f0d6e020d307b5, type: 3}
+  - colorType: 3
+    sprite: {fileID: 21300000, guid: ad773e7431c1a404ca26e1962f873c3a, type: 3}
+  - colorType: 4
+    sprite: {fileID: 21300000, guid: 68ed693dbfd40ee47a9002d174d9f583, type: 3}
+  - colorType: 5
+    sprite: {fileID: 21300000, guid: b4cb8a8fba531b24dbcb67c34e70bc21, type: 3}
+  - colorType: 6
+    sprite: {fileID: 21300000, guid: 52971b29982bd5542b81346318127a2b, type: 3}
   spritesDir: {fileID: 102900000, guid: 04f6affffccfb4d029202f696c0ae140, type: 3}
 --- !u!1001 &100100000
 Prefab:

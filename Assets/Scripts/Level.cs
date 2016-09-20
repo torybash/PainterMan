@@ -317,7 +317,7 @@ public class LevelEditor : Editor {
 		GUILayout.EndHorizontal();
 
 		Lvl.currTileObjectIdx = EditorGUILayout.Popup(Lvl.currTileObjectIdx, TileObjectNames);
-		if (Lvl.tileObjectPrefab != null && Lvl.tileObjectPrefab.GetComponent<SpriteRenderer>() != null) {
+		if (Lvl.tileObjectPrefab != null && Lvl.tileObjectPrefab.GetComponent<SpriteRenderer>() != null && Lvl.tileObjectPrefab.GetComponent<SpriteRenderer>().sprite != null) {
 			GUILayout.Box(Lvl.tileObjectPrefab.GetComponent<SpriteRenderer>().sprite.texture, GUILayout.Width(60), GUILayout.Height(60));
 		}
 		if (Lvl.tileObjectPrefab != null && Lvl.tileObjectDefinition != null) {

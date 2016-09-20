@@ -25,10 +25,18 @@ public class SpriteLibrary : Library<SpriteLibrary> {
 		public Color color;
 	}
 
+	[System.Serializable]
+	public class BucketSpriteDefinition{
+		public TileColor colorType;
+		public Sprite sprite;
+	}
+
 	[SerializeField] List<SpriteDefinition> allSpritesList;
 
 	[SerializeField] List<TileSpriteDefinition> tileSpriteList;
 	[SerializeField] List<ColorDefinition> tileColorList;
+
+	[SerializeField] List<BucketSpriteDefinition> bucketSpriteList;
 
 	public static Sprite GetSprite(string name) {
 		//UnityEngine.Debug.Log("GetSprite - name: " + name + ", I.allSpritesList.Exists((elem) => elem.name == name): "+ (I.allSpritesList.Exists((elem) => elem.name == name)));
@@ -49,7 +57,10 @@ public class SpriteLibrary : Library<SpriteLibrary> {
 		//		var val = from elem in I.tileSpriteList where elem.type == type select elem;
 	}
 
-
+	public static Sprite GetBucketSprite(TileColor colorType){
+		if (!I.bucketSpriteList.Exists((elem) => elem.colorType == colorType)) return null;
+		return I.bucketSpriteList.First((elem) => elem.colorType == colorType).sprite;
+	}
 
 #if UNITY_EDITOR
 	[SerializeField] DefaultAsset spritesDir;

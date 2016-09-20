@@ -30,7 +30,8 @@ public class PaintBucket : TileObject {
 	}
 
 	protected override void Refresh() {
-		if (_bucketRend != null) _bucketRend.color = SpriteLibrary.GetTileColor(_paintBucketDef.color);
+		//if (_bucketRend != null) _bucketRend.color = SpriteLibrary.GetTileColor(_paintBucketDef.color);
+		if (_bucketRend != null) _bucketRend.sprite = SpriteLibrary.GetBucketSprite(_paintBucketDef.color);
 	}
 
 }

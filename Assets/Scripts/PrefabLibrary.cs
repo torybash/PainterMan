@@ -35,7 +35,7 @@ public class PrefabLibrary : Library<PrefabLibrary> {
 	public TileObject GetTileObject(Type typ) {
 		Debug.Log("GetTileObject");
 		foreach (var toPrefab in tileObjectPrefabs) {
-			Debug.Log("toPrefab.GetType(): " + toPrefab.GetType() + ", typ: "+ typ);
+			Debug.Log("toPrefab.GetType(): " + toPrefab.GetType() + ", typ: " + typ);
 			if (toPrefab.GetType() == typ) {
 				return InstantiatePrefab<TileObject>(toPrefab) ;
 			}

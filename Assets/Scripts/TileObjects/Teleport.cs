@@ -5,7 +5,7 @@ using System;
 
 public class Teleport : TileObject {
 
-	[SerializeField] TeleportDefinition def;
+	[SerializeField] TeleportDefinition _def;
 
 	private class TeleportCycle {
 		public List<Teleport> teleportList;
@@ -30,23 +30,28 @@ public class Teleport : TileObject {
 
 
 	public override TileObjectDefintion ToDef {
-		get {return def;}
-		set {def = (TeleportDefinition)value;}
+		get {return _def;}
+		set {_def = (TeleportDefinition)value;}
 	}
 
 	public override void Set(TileObjectDefintion def) {
 		base.Set(def);
+		if (def.GetType() == typeof(TeleportDefinition)) {
+			TeleportDefinition newDef = (TeleportDefinition)def;
+			_def.teleportCycleIdx = newDef.teleportCycleIdx;
+		}
+		Refresh();
 	}
 
 	public override TileObjectInteractionResult PlayerEntered() {
-		if (teleportCycles == null || teleportCycles.Length <= def.teleportCycleIdx) {
+		if (teleportCycles == null || teleportCycles.Length <= _def.teleportCycleIdx) {
 			Debug.LogError("teleportCycles not created??");
 			return TileObjectInteractionResult.Empty();
 		}
 		Vec2i teleportPos = Vec2i.Zero;
-		int thisTPIdx = teleportCycles[def.teleportCycleIdx].teleportList.IndexOf(this);
-		if (thisTPIdx + 1 == teleportCycles[def.teleportCycleIdx].teleportList.Count) teleportPos = teleportCycles[def.teleportCycleIdx].teleportList[0].def.pos;
-		else teleportPos = teleportCycles[def.teleportCycleIdx].teleportList[thisTPIdx + 1].def.pos;
+		int thisTPIdx = teleportCycles[_def.teleportCycleIdx].teleportList.IndexOf(this);
+		if (thisTPIdx + 1 == teleportCycles[_def.teleportCycleIdx].teleportList.Count) teleportPos = teleportCycles[_def.teleportCycleIdx].teleportList[0]._def.pos;
+		else teleportPos = teleportCycles[_def.teleportCycleIdx].teleportList[thisTPIdx + 1]._def.pos;
 		return new TileObjectInteractionResult(TileObjectInteractionResultType.Teleport, teleportPos);
 	}
 
@@ -56,16 +61,16 @@ public class Teleport : TileObject {
 
 
 
-	//void OnDrawGizmos() {
-	//	Teleport[] teleports = transform.root.GetComponentsInChildren<Teleport>();
-		
-	//	foreach (var tp in teleports) {
-	//		Gizmos.color = new Color(1 - def.teleportCycleIdx % 2, 1 - def.teleportCycleIdx % 3, 0 + def.teleportCycleIdx % 4);
-	//		if (tp != this && tp.def.teleportCycleIdx == def.teleportCycleIdx) {
-	//			Gizmos.DrawLine(transform.position, tp.transform.position);
-	//		}
-	//	}
-	//}
+	void OnDrawGizmos() {
+		Teleport[] teleports = transform.root.GetComponentsInChildren<Teleport>();
+
+		foreach (var tp in teleports) {
+			Gizmos.color = new Color(1 - _def.teleportCycleIdx % 2, 1 - _def.teleportCycleIdx % 3, 0 + _def.teleportCycleIdx % 4);
+			if (tp != this && tp._def.teleportCycleIdx == _def.teleportCycleIdx) {
+				Gizmos.DrawLine(transform.position, tp.transform.position);
+			}
+		}
+	}
 }
 
 
