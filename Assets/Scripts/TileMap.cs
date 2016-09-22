@@ -168,7 +168,7 @@ public class TileMap {
 #if UNITY_EDITOR
 			Undo.DestroyObjectImmediate(to.gameObject);
 #else
-			Destroy(other);
+			GameObject.Destroy(other);
 #endif
 			return;
 		}

@@ -39,15 +39,17 @@ public class Trail : MonoBehaviour {
 		float fracDry = 1f - ((_paintedTurn + GameRules.GetTimeToDry(_tileClr) < Game.I.Turn) ? 0f : 0.5f);
 
 		if (GameRules.PaintGradient) {
-			fracDry = 1f - (Game.I.Turn - 1 - _paintedTurn) / (float) GameRules.GetTimeToDry(_tileClr);
+			fracDry = 0.4f + 0.6f * (1f - (Game.I.Turn - 1 - _paintedTurn) / (float) GameRules.GetTimeToDry(_tileClr));
 		}
 		fracDry = Mathf.Clamp01(fracDry);
 		Debug.Log("Trail UpdateColor - fracDry: "+ fracDry);
 
 		var col = SpriteLibrary.GetTileColor(_tileClr);
 		var secCol = SpriteLibrary.GetTileColor(_secondTileClr);
-		Mat.SetColor("_Color", new Color(col.r * fracDry, col.g * fracDry, col.b * fracDry));
-		Mat.SetColor("_SecondColor", new Color(secCol.r * fracDry, secCol.g * fracDry, secCol.b * fracDry));
+		//Mat.SetColor("_Color", new Color(col.r * fracDry, col.g * fracDry, col.b * fracDry));
+		//Mat.SetColor("_SecondColor", new Color(secCol.r * fracDry, secCol.g * fracDry, secCol.b * fracDry));
+		Mat.SetColor("_Color", new Color(col.r, col.g, col.b, fracDry));
+		Mat.SetColor("_SecondColor", new Color(secCol.r, secCol.g, secCol.b, fracDry));
 		//Mat.color = new Color(col.r * fracDry, col.g * fracDry, col.b * fracDry);
 		//}
 	}

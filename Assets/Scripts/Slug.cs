@@ -9,7 +9,6 @@ public class Slug : MonoBehaviour {
 
 
 	[SerializeField] SpriteRenderer sr;
-
 	
 
 	public void SetPosition(Vec2i pos) {

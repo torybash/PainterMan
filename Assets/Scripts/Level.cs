@@ -122,7 +122,7 @@ public class Level : ProBehaviour {
 	#endregion TileMap Wrappers
 
 	#region Editor
-	[HideInInspector][SerializeField] public LevelEditor.ControlType currControl;
+	[HideInInspector][SerializeField] public ControlType currControl;
 	[HideInInspector][SerializeField] public int currTileObjectIdx;
 	[HideInInspector][SerializeField] public int lastTileObjectIdx = -1;
 
@@ -199,13 +199,13 @@ public class Level : ProBehaviour {
 }
 
 
+public enum ControlType { Disabled, TilePaint, TileObject}
 
 
 #if UNITY_EDITOR
 [CustomEditor(typeof(Level))]
 public class LevelEditor : Editor {
 
-	public enum ControlType { Disabled, TilePaint, TileObject}
 
 	private int hintID = -1;
 	private int HintID {
