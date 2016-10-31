@@ -832,7 +832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b58b8d0b85f40beb4856ecb6b6f518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slugPrefab: {fileID: 0}
+  slugPrefab: {fileID: 11463750, guid: 78ae999880f5c2a4c9972012c7f093cd, type: 2}
   state: 0
 --- !u!4 &789690687
 Transform:
